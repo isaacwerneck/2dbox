@@ -1,0 +1,653 @@
+{
+  "users": [
+    {
+      "id": "1780007454893",
+      "name": "isaac",
+      "passwordHash": "$2a$10$x/V95N6glw.E7j244lMO/ORHW..QKo6yZn6w9PYhPSithpIFFZFM6",
+      "createdAt": "2026-05-28T22:30:54.893Z",
+      "desktopData": {
+        "friends": [
+          {
+            "id": "f-1780072151049-0ed51c",
+            "name": "julia",
+            "status": "accepted",
+            "presence": "offline"
+          }
+        ],
+        "notifications": [
+          {
+            "id": "n-1780072151049-c71479",
+            "text": "julia accepted your friend request.",
+            "read": true,
+            "createdAt": "2026-05-29T16:29:11.049Z"
+          },
+          {
+            "id": "n-1780072128046-4dd528",
+            "text": "julia is now your friend.",
+            "read": true,
+            "createdAt": "2026-05-29T16:28:48.046Z"
+          },
+          {
+            "id": "n-1780072110821-e4ce67",
+            "text": "julia sent you a friend request.",
+            "read": true,
+            "createdAt": "2026-05-29T16:28:30.821Z"
+          },
+          {
+            "id": "n-1780071806683-be052e",
+            "text": "julia is now your friend.",
+            "read": true,
+            "createdAt": "2026-05-29T16:23:26.683Z"
+          },
+          {
+            "id": "n-1780035455527-9e6d4f",
+            "text": "julia is now your friend.",
+            "read": true,
+            "createdAt": "2026-05-29T06:17:35.527Z"
+          }
+        ],
+        "conversations": [
+          {
+            "id": "c-1780071811047",
+            "with": "julia",
+            "messages": [
+              {
+                "id": "m-1780071811047",
+                "from": "isaac",
+                "text": "oi",
+                "createdAt": "2026-05-29T16:23:31.047Z"
+              },
+              {
+                "id": "m-1780071825975",
+                "from": "isaac",
+                "text": "oi",
+                "createdAt": "2026-05-29T16:23:45.975Z"
+              },
+              {
+                "id": "m-1780071830293",
+                "from": "isaac",
+                "text": "oi",
+                "createdAt": "2026-05-29T16:23:50.293Z"
+              },
+              {
+                "id": "m-1780071834147",
+                "from": "isaac",
+                "text": "que isso",
+                "createdAt": "2026-05-29T16:23:54.147Z"
+              },
+              {
+                "id": "m-1780073518233-56eefa",
+                "from": "isaac",
+                "text": "oiiiiiiiiiiii",
+                "createdAt": "2026-05-29T16:51:58.233Z"
+              },
+              {
+                "id": "m-1780073530477-455b88",
+                "from": "julia",
+                "text": "eaiiii",
+                "createdAt": "2026-05-29T16:52:10.477Z"
+              }
+            ]
+          }
+        ],
+        "feed": [
+          {
+            "id": "e-1780072134748-8ab269",
+            "type": "friend",
+            "text": "You removed julia from your friends.",
+            "createdAt": "2026-05-29T16:28:54.748Z"
+          },
+          {
+            "id": "e-1780072128046-68a698",
+            "type": "friend",
+            "text": "You accepted julia's friend request.",
+            "createdAt": "2026-05-29T16:28:48.046Z"
+          },
+          {
+            "id": "e-1780072110821-0165e4",
+            "type": "friend",
+            "text": "julia sent you a friend request.",
+            "createdAt": "2026-05-29T16:28:30.821Z"
+          },
+          {
+            "id": "e-1780071806683-fa69e3",
+            "type": "friend",
+            "text": "You accepted julia's friend request.",
+            "createdAt": "2026-05-29T16:23:26.683Z"
+          },
+          {
+            "id": "e-1780035521371-11eded",
+            "type": "friend",
+            "text": "You removed julia from your friends.",
+            "createdAt": "2026-05-29T06:18:41.371Z"
+          },
+          {
+            "id": "e-1780035455528-b97cd9",
+            "type": "friend",
+            "text": "You accepted julia's friend request.",
+            "createdAt": "2026-05-29T06:17:35.528Z"
+          },
+          {
+            "id": "e-1780034769281-016c2e",
+            "type": "friend",
+            "text": "You removed Mika from your friends.",
+            "createdAt": "2026-05-29T06:06:09.281Z"
+          },
+          {
+            "id": "e-1780034768771-b9feff",
+            "type": "friend",
+            "text": "You removed luna_test from your friends.",
+            "createdAt": "2026-05-29T06:06:08.771Z"
+          },
+          {
+            "id": "e-1780034493752-29abb3",
+            "type": "friend",
+            "text": "You accepted luna_test's friend request.",
+            "createdAt": "2026-05-29T06:01:33.752Z"
+          },
+          {
+            "id": "e-1780033905497-893e7f",
+            "type": "friend",
+            "text": "You removed Rafa from your friends.",
+            "createdAt": "2026-05-29T05:51:45.497Z"
+          },
+          {
+            "id": "e-1780033471447",
+            "type": "message",
+            "text": "isaac sent a message to Luna.",
+            "createdAt": "2026-05-29T05:44:31.447Z"
+          },
+          {
+            "id": "e-1780033462195",
+            "type": "message",
+            "text": "isaac sent a message to Mika.",
+            "createdAt": "2026-05-29T05:44:22.195Z"
+          },
+          {
+            "id": "e-1780033462181",
+            "type": "message",
+            "text": "isaac sent a message to Mika.",
+            "createdAt": "2026-05-29T05:44:22.181Z"
+          },
+          {
+            "id": "e-1780033237734-120c69",
+            "type": "friend",
+            "text": "You removed GhostPixel from your friends.",
+            "createdAt": "2026-05-29T05:40:37.734Z"
+          },
+          {
+            "id": "e-1780032898460-04a3d5",
+            "type": "friend",
+            "text": "You removed Luna from your friends.",
+            "createdAt": "2026-05-29T05:34:58.460Z"
+          },
+          {
+            "id": "e-1780032898451-b29583",
+            "type": "friend",
+            "text": "You accepted Rafa's friend request.",
+            "createdAt": "2026-05-29T05:34:58.451Z"
+          },
+          {
+            "id": "e-1780032671722",
+            "type": "message",
+            "text": "isaac sent a message to Mika.",
+            "createdAt": "2026-05-29T05:31:11.722Z"
+          },
+          {
+            "id": "e-1780032611939",
+            "type": "message",
+            "text": "isaac sent a message to Luna.",
+            "createdAt": "2026-05-29T05:30:11.939Z"
+          },
+          {
+            "id": "e1",
+            "type": "house",
+            "text": "Luna changed house wallpaper.",
+            "createdAt": "2026-05-29T05:30:03.267Z"
+          },
+          {
+            "id": "e2",
+            "type": "park",
+            "text": "Mika invited friends to the park.",
+            "createdAt": "2026-05-29T05:30:03.267Z"
+          },
+          {
+            "id": "e3",
+            "type": "friend",
+            "text": "Rafa sent you a friend request.",
+            "createdAt": "2026-05-29T05:30:03.267Z"
+          }
+        ],
+        "config": {
+          "wallpaperColor": "#080808",
+          "borderColor": "#000000",
+          "themeColor": "#6c19a4",
+          "soundEnabled": true,
+          "language": "en"
+        },
+        "gamePreview": {
+          "zone": "Starter House",
+          "lastParkVisit": "Today",
+          "houseTheme": "Blue Classic",
+          "visitorsToday": 3
+        }
+      }
+    },
+    {
+      "id": "1780035430798",
+      "name": "julia",
+      "passwordHash": "$2a$10$V.v4ZbM3g0AvVd.0Kr00N.6T0Wgh6.CQOcqHkEL453ZHnMRqbObKW",
+      "createdAt": "2026-05-29T06:17:10.798Z",
+      "desktopData": {
+        "friends": [
+          {
+            "id": "f-1780072141945-0ef1f7",
+            "name": "isaac",
+            "status": "accepted",
+            "presence": "offline"
+          }
+        ],
+        "notifications": [
+          {
+            "id": "n-1780072151049-30bf50",
+            "text": "isaac is now your friend.",
+            "read": false,
+            "createdAt": "2026-05-29T16:29:11.049Z"
+          },
+          {
+            "id": "n-1780072141946-165201",
+            "text": "isaac sent you a friend request.",
+            "read": false,
+            "createdAt": "2026-05-29T16:29:01.946Z"
+          },
+          {
+            "id": "n-1780072128046-0f2e5e",
+            "text": "isaac accepted your friend request.",
+            "read": false,
+            "createdAt": "2026-05-29T16:28:48.046Z"
+          }
+        ],
+        "conversations": [
+          {
+            "id": "c-1780072154274",
+            "with": "isaac",
+            "messages": [
+              {
+                "id": "m-1780072154274",
+                "from": "julia",
+                "text": "hay",
+                "createdAt": "2026-05-29T16:29:14.274Z"
+              },
+              {
+                "id": "m-1780073518233-56eefa",
+                "from": "isaac",
+                "text": "oiiiiiiiiiiii",
+                "createdAt": "2026-05-29T16:51:58.233Z"
+              },
+              {
+                "id": "m-1780073530477-455b88",
+                "from": "julia",
+                "text": "eaiiii",
+                "createdAt": "2026-05-29T16:52:10.477Z"
+              }
+            ]
+          }
+        ],
+        "feed": [
+          {
+            "id": "e-1780072151049-dcf31c",
+            "type": "friend",
+            "text": "You accepted isaac's friend request.",
+            "createdAt": "2026-05-29T16:29:11.049Z"
+          },
+          {
+            "id": "e-1780072141946-5322fa",
+            "type": "friend",
+            "text": "isaac sent you a friend request.",
+            "createdAt": "2026-05-29T16:29:01.946Z"
+          },
+          {
+            "id": "e-1780072105424-949d3d",
+            "type": "friend",
+            "text": "You removed isaac from your friends.",
+            "createdAt": "2026-05-29T16:28:25.424Z"
+          },
+          {
+            "id": "e-1780071853715-c6e89b",
+            "type": "friend",
+            "text": "You accepted isaac's friend request.",
+            "createdAt": "2026-05-29T16:24:13.715Z"
+          },
+          {
+            "id": "e-1780035514682-4e7a1c",
+            "type": "friend",
+            "text": "You removed isaac from your friends.",
+            "createdAt": "2026-05-29T06:18:34.682Z"
+          },
+          {
+            "id": "e-1780035434936-acf961",
+            "type": "friend",
+            "text": "You accepted isaac's friend request.",
+            "createdAt": "2026-05-29T06:17:14.936Z"
+          }
+        ],
+        "config": {
+          "wallpaperColor": "#3f76bf",
+          "borderColor": "#0f2b4a",
+          "themeColor": "#2f6eb1",
+          "soundEnabled": true,
+          "language": "en"
+        },
+        "gamePreview": {
+          "zone": "Starter House",
+          "lastParkVisit": "Today",
+          "houseTheme": "Blue Classic",
+          "visitorsToday": 3
+        }
+      }
+    },
+    {
+      "id": "1780072035733",
+      "name": "req_1780072035595",
+      "passwordHash": "$2a$10$wdwMflKvdfjp40GsBkUSYe1C1W5GFI9D3PLntOdVZLsoJPc/r32US",
+      "createdAt": "2026-05-29T16:27:15.733Z",
+      "desktopData": {
+        "friends": [
+          {
+            "id": "f-1780072035841-e45650",
+            "name": "recv_1780072035595",
+            "status": "accepted",
+            "presence": "offline"
+          }
+        ],
+        "notifications": [
+          {
+            "id": "n-1780072035841-6ca751",
+            "text": "recv_1780072035595 accepted your friend request.",
+            "read": false,
+            "createdAt": "2026-05-29T16:27:15.841Z"
+          }
+        ],
+        "conversations": [
+          {
+            "id": "c-1780072035852",
+            "with": "recv_1780072035595",
+            "messages": [
+              {
+                "id": "m-1780072035852",
+                "from": "req_1780072035595",
+                "text": "hello after accept",
+                "createdAt": "2026-05-29T16:27:15.852Z"
+              }
+            ]
+          }
+        ],
+        "feed": [],
+        "config": {
+          "wallpaperColor": "#3f76bf",
+          "borderColor": "#0f2b4a",
+          "themeColor": "#2f6eb1",
+          "soundEnabled": true,
+          "language": "en"
+        },
+        "gamePreview": {
+          "zone": "Starter House",
+          "lastParkVisit": "Today",
+          "houseTheme": "Blue Classic",
+          "visitorsToday": 3
+        }
+      }
+    },
+    {
+      "id": "1780072035816",
+      "name": "recv_1780072035595",
+      "passwordHash": "$2a$10$ku2R9wwd8S/u4YyXYxf8ee/aOmVQuvxK/9jKnbIDjWNooHKLvoN06",
+      "createdAt": "2026-05-29T16:27:15.816Z",
+      "desktopData": {
+        "friends": [
+          {
+            "id": "f-1780072035824-32f2fe",
+            "name": "req_1780072035595",
+            "status": "accepted",
+            "presence": "offline"
+          }
+        ],
+        "notifications": [
+          {
+            "id": "n-1780072035841-7a0e39",
+            "text": "req_1780072035595 is now your friend.",
+            "read": false,
+            "createdAt": "2026-05-29T16:27:15.841Z"
+          },
+          {
+            "id": "n-1780072035824-b3970a",
+            "text": "req_1780072035595 sent you a friend request.",
+            "read": false,
+            "createdAt": "2026-05-29T16:27:15.824Z"
+          }
+        ],
+        "conversations": [],
+        "feed": [
+          {
+            "id": "e-1780072035841-fa9df7",
+            "type": "friend",
+            "text": "You accepted req_1780072035595's friend request.",
+            "createdAt": "2026-05-29T16:27:15.841Z"
+          },
+          {
+            "id": "e-1780072035824-41f637",
+            "type": "friend",
+            "text": "req_1780072035595 sent you a friend request.",
+            "createdAt": "2026-05-29T16:27:15.824Z"
+          }
+        ],
+        "config": {
+          "wallpaperColor": "#3f76bf",
+          "borderColor": "#0f2b4a",
+          "themeColor": "#2f6eb1",
+          "soundEnabled": true,
+          "language": "en"
+        },
+        "gamePreview": {
+          "zone": "Starter House",
+          "lastParkVisit": "Today",
+          "houseTheme": "Blue Classic",
+          "visitorsToday": 3
+        }
+      }
+    },
+    {
+      "id": "1780072044223",
+      "name": "reqd_1780072044089",
+      "passwordHash": "$2a$10$zowadRAcKPy2pZltupoSe.3d.26r/UdzWgOu6ZtNTQthYzvormZOa",
+      "createdAt": "2026-05-29T16:27:24.223Z",
+      "desktopData": {
+        "friends": [],
+        "notifications": [],
+        "conversations": [],
+        "feed": [],
+        "config": {
+          "wallpaperColor": "#3f76bf",
+          "borderColor": "#0f2b4a",
+          "themeColor": "#2f6eb1",
+          "soundEnabled": true,
+          "language": "en"
+        },
+        "gamePreview": {
+          "zone": "Starter House",
+          "lastParkVisit": "Today",
+          "houseTheme": "Blue Classic",
+          "visitorsToday": 3
+        }
+      }
+    },
+    {
+      "id": "1780072044306",
+      "name": "recvd_1780072044089",
+      "passwordHash": "$2a$10$atHX8daCTjZZWhMnWHVuCuEdg.A9aI2EeAq/Tjz68mxomVv0UzjiC",
+      "createdAt": "2026-05-29T16:27:24.306Z",
+      "desktopData": {
+        "friends": [],
+        "notifications": [
+          {
+            "id": "n-1780072044319-434780",
+            "text": "reqd_1780072044089 sent you a friend request.",
+            "read": false,
+            "createdAt": "2026-05-29T16:27:24.319Z"
+          }
+        ],
+        "conversations": [],
+        "feed": [
+          {
+            "id": "e-1780072044330-5cff46",
+            "type": "friend",
+            "text": "You declined reqd_1780072044089's friend request.",
+            "createdAt": "2026-05-29T16:27:24.330Z"
+          },
+          {
+            "id": "e-1780072044320-15a2ba",
+            "type": "friend",
+            "text": "reqd_1780072044089 sent you a friend request.",
+            "createdAt": "2026-05-29T16:27:24.320Z"
+          }
+        ],
+        "config": {
+          "wallpaperColor": "#3f76bf",
+          "borderColor": "#0f2b4a",
+          "themeColor": "#2f6eb1",
+          "soundEnabled": true,
+          "language": "en"
+        },
+        "gamePreview": {
+          "zone": "Starter House",
+          "lastParkVisit": "Today",
+          "houseTheme": "Blue Classic",
+          "visitorsToday": 3
+        }
+      }
+    },
+    {
+      "id": "1780072258346",
+      "name": "msgA_1780072258217",
+      "passwordHash": "$2a$10$kH8mZxJgBDcl0ZzigkYpCuhQWqiMdITbC8Qbkv3GknJHIgU2bF9Vy",
+      "createdAt": "2026-05-29T16:30:58.346Z",
+      "desktopData": {
+        "friends": [
+          {
+            "id": "f-1780072258444-92c1c7",
+            "name": "msgB_1780072258217",
+            "status": "accepted",
+            "presence": "offline"
+          }
+        ],
+        "notifications": [
+          {
+            "id": "n-1780072258444-862d34",
+            "text": "msgB_1780072258217 accepted your friend request.",
+            "read": false,
+            "createdAt": "2026-05-29T16:30:58.444Z"
+          }
+        ],
+        "conversations": [
+          {
+            "id": "c-1780072258448-be8390",
+            "with": "msgB_1780072258217",
+            "messages": [
+              {
+                "id": "m-1780072258448-42e029",
+                "from": "msgA_1780072258217",
+                "text": "hello_1780072258447",
+                "createdAt": "2026-05-29T16:30:58.448Z"
+              }
+            ]
+          }
+        ],
+        "feed": [],
+        "config": {
+          "wallpaperColor": "#3f76bf",
+          "borderColor": "#0f2b4a",
+          "themeColor": "#2f6eb1",
+          "soundEnabled": true,
+          "language": "en"
+        },
+        "gamePreview": {
+          "zone": "Starter House",
+          "lastParkVisit": "Today",
+          "houseTheme": "Blue Classic",
+          "visitorsToday": 3
+        }
+      }
+    },
+    {
+      "id": "1780072258429",
+      "name": "msgB_1780072258217",
+      "passwordHash": "$2a$10$Yh/wbS2f3kZWSEWmJmmD/eEDOdQJV7sTupYczndwmXrG4qWO5601y",
+      "createdAt": "2026-05-29T16:30:58.429Z",
+      "desktopData": {
+        "friends": [
+          {
+            "id": "f-1780072258435-6c8216",
+            "name": "msgA_1780072258217",
+            "status": "accepted",
+            "presence": "offline"
+          }
+        ],
+        "notifications": [
+          {
+            "id": "n-1780072258444-5de66c",
+            "text": "msgA_1780072258217 is now your friend.",
+            "read": false,
+            "createdAt": "2026-05-29T16:30:58.444Z"
+          },
+          {
+            "id": "n-1780072258435-e08f9f",
+            "text": "msgA_1780072258217 sent you a friend request.",
+            "read": false,
+            "createdAt": "2026-05-29T16:30:58.435Z"
+          }
+        ],
+        "conversations": [
+          {
+            "id": "c-1780072258448-1aac4f",
+            "with": "msgA_1780072258217",
+            "messages": [
+              {
+                "id": "m-1780072258448-42e029",
+                "from": "msgA_1780072258217",
+                "text": "hello_1780072258447",
+                "createdAt": "2026-05-29T16:30:58.448Z"
+              }
+            ]
+          }
+        ],
+        "feed": [
+          {
+            "id": "e-1780072258444-5acfd3",
+            "type": "friend",
+            "text": "You accepted msgA_1780072258217's friend request.",
+            "createdAt": "2026-05-29T16:30:58.444Z"
+          },
+          {
+            "id": "e-1780072258435-87dfe8",
+            "type": "friend",
+            "text": "msgA_1780072258217 sent you a friend request.",
+            "createdAt": "2026-05-29T16:30:58.435Z"
+          }
+        ],
+        "config": {
+          "wallpaperColor": "#3f76bf",
+          "borderColor": "#0f2b4a",
+          "themeColor": "#2f6eb1",
+          "soundEnabled": true,
+          "language": "en"
+        },
+        "gamePreview": {
+          "zone": "Starter House",
+          "lastParkVisit": "Today",
+          "houseTheme": "Blue Classic",
+          "visitorsToday": 3
+        }
+      }
+    }
+  ]
+}

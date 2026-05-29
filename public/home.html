@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2DBox | Home</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/desktop.css" />
+  </head>
+  <body>
+    <main class="desktop" id="desktop">
+      <section class="desktop-window" id="window-friends" data-window="friends" style="left: 3vw; top: 8vh; width: min(340px, 92vw); height: 360px">
+        <header class="window-titlebar">
+          <h2 data-i18n="window.friends">Friend List</h2>
+          <div class="window-controls">
+            <button class="window-titlebtn window-minimize" type="button" data-minimize="friends" aria-label="Minimize Friend List">-</button>
+            <button class="window-titlebtn window-maximize" type="button" data-maximize="friends" aria-label="Maximize Friend List">□</button>
+            <button class="window-titlebtn window-close" type="button" data-close="friends" aria-label="Close Friend List">x</button>
+          </div>
+        </header>
+        <div class="window-content">
+          <p class="window-meta" id="welcome-text"></p>
+          <div class="window-actions friend-toolbar">
+            <input id="friend-search" type="text" placeholder="Search friend" data-i18n-placeholder="friend.search" />
+            <select id="friend-filter">
+              <option value="all" data-i18n="friend.filter.all">All</option>
+              <option value="accepted" data-i18n="friend.filter.accepted">Friends</option>
+              <option value="pending" data-i18n="friend.filter.pending">Pending</option>
+            </select>
+            <button id="friend-mode-toggle" class="small-btn" type="button" data-i18n="friend.mode.add">Add</button>
+          </div>
+          <ul class="friends-list" id="friends-list"></ul>
+        </div>
+        <div class="window-resize-handle" aria-hidden="true"></div>
+      </section>
+
+      <section class="desktop-window" id="window-game" data-window="game" style="left: 26vw; top: 12vh; width: min(560px, 94vw); height: 420px">
+        <header class="window-titlebar">
+          <h2 data-i18n="window.game">Game Preview</h2>
+          <div class="window-controls">
+            <button class="window-titlebtn window-minimize" type="button" data-minimize="game" aria-label="Minimize Game Preview">-</button>
+            <button class="window-titlebtn window-maximize" type="button" data-maximize="game" aria-label="Maximize Game Preview">□</button>
+            <button class="window-titlebtn window-close" type="button" data-close="game" aria-label="Close Game Preview">x</button>
+          </div>
+        </header>
+        <div class="window-content game-placeholder">
+          <div class="pixel-board">
+            <p id="game-zone" data-i18n="game.loadingZone">Loading zone...</p>
+          </div>
+          <p class="window-meta" id="game-meta" data-i18n="game.loadingMeta">Loading game preview...</p>
+        </div>
+        <div class="window-resize-handle" aria-hidden="true"></div>
+      </section>
+
+      <section class="desktop-window" id="window-notifications" data-window="notifications" style="left: 62vw; top: 8vh; width: min(360px, 94vw); height: 300px">
+        <header class="window-titlebar">
+          <h2 data-i18n="window.notifications">Notifications</h2>
+          <div class="window-controls">
+            <button class="window-titlebtn window-minimize" type="button" data-minimize="notifications" aria-label="Minimize Notifications">-</button>
+            <button class="window-titlebtn window-maximize" type="button" data-maximize="notifications" aria-label="Maximize Notifications">□</button>
+            <button class="window-titlebtn window-close" type="button" data-close="notifications" aria-label="Close Notifications">x</button>
+          </div>
+        </header>
+        <div class="window-content">
+          <div class="window-actions">
+            <button id="mark-all-read" class="small-btn" type="button" data-i18n="notifications.markAll">Mark all as read</button>
+            <button id="clear-notifications" class="small-btn" type="button" data-i18n="notifications.clear">Clear</button>
+          </div>
+          <ul class="feed-list" id="notifications-list"></ul>
+        </div>
+        <div class="window-resize-handle" aria-hidden="true"></div>
+      </section>
+
+      <section class="desktop-window" id="window-message-box" data-window="messages" style="left: 54vw; top: 44vh; width: min(390px, 94vw); height: 320px">
+        <header class="window-titlebar">
+          <h2 data-i18n="window.messages">Message Box</h2>
+          <div class="window-controls">
+            <button class="window-titlebtn window-minimize" type="button" data-minimize="messages" aria-label="Minimize Message Box">-</button>
+            <button class="window-titlebtn window-maximize" type="button" data-maximize="messages" aria-label="Maximize Message Box">□</button>
+            <button class="window-titlebtn window-close" type="button" data-close="messages" aria-label="Close Message Box">x</button>
+          </div>
+        </header>
+        <div class="window-content">
+          <div class="message-controls">
+            <label for="message-conversation" data-i18n="messages.conversation">Conversation</label>
+            <select id="message-conversation"></select>
+            <button id="delete-conversation" class="small-btn tiny-btn warn" type="button" data-i18n="messages.delete">Delete</button>
+          </div>
+          <ul class="message-thread" id="messages-list"></ul>
+          <form id="message-form" class="inline-form">
+            <input id="message-input" type="text" maxlength="240" placeholder="Type a message" required data-i18n-placeholder="messages.placeholder" />
+            <button class="small-btn" type="submit" data-i18n="messages.send">Send</button>
+          </form>
+        </div>
+        <div class="window-resize-handle" aria-hidden="true"></div>
+      </section>
+
+      <section class="desktop-window" id="window-feed" data-window="feed" style="left: 6vw; top: 48vh; width: min(430px, 94vw); height: 280px">
+        <header class="window-titlebar">
+          <h2 data-i18n="window.feed">Social Feed</h2>
+          <div class="window-controls">
+            <button class="window-titlebtn window-minimize" type="button" data-minimize="feed" aria-label="Minimize Social Feed">-</button>
+            <button class="window-titlebtn window-maximize" type="button" data-maximize="feed" aria-label="Maximize Social Feed">□</button>
+            <button class="window-titlebtn window-close" type="button" data-close="feed" aria-label="Close Social Feed">x</button>
+          </div>
+        </header>
+        <div class="window-content">
+          <ul class="feed-list" id="social-feed-list"></ul>
+        </div>
+        <div class="window-resize-handle" aria-hidden="true"></div>
+      </section>
+
+      <section class="desktop-window" id="window-configurations" data-window="configurations" style="left: 36vw; top: 52vh; width: min(430px, 96vw); height: 330px">
+        <header class="window-titlebar">
+          <h2 data-i18n="window.config">Configurations</h2>
+          <div class="window-controls">
+            <button class="window-titlebtn window-minimize" type="button" data-minimize="configurations" aria-label="Minimize Configurations">-</button>
+            <button class="window-titlebtn window-maximize" type="button" data-maximize="configurations" aria-label="Maximize Configurations">□</button>
+            <button class="window-titlebtn window-close" type="button" data-close="configurations" aria-label="Close Configurations">x</button>
+          </div>
+        </header>
+        <div class="window-content">
+          <form id="config-form" class="config-shell">
+            <div class="config-nav">
+              <button type="button" class="config-tab active" data-config-section="personalize" data-i18n="config.section.personalize">Personalize</button>
+              <button type="button" class="config-tab" data-config-section="language" data-i18n="config.section.language">Language</button>
+              <button type="button" class="config-tab" data-config-section="sound" data-i18n="config.section.sound">Sound Options</button>
+            </div>
+
+            <section class="config-panel" data-config-panel="personalize">
+              <label for="wallpaper-color" data-i18n="config.wallpaper">Wallpaper Color</label>
+              <input id="wallpaper-color" type="color" value="#3f76bf" />
+
+              <label for="border-color" data-i18n="config.border">Window Border Color</label>
+              <input id="border-color" type="color" value="#0f2b4a" />
+
+              <label for="theme-color" data-i18n="config.theme">Theme Color</label>
+              <input id="theme-color" type="color" value="#2f6eb1" />
+            </section>
+
+            <section class="config-panel hidden" data-config-panel="language">
+              <label for="language-select" data-i18n="config.language">Language</label>
+              <select id="language-select">
+                <option value="en" data-i18n="language.english">English</option>
+                <option value="pt-BR" data-i18n="language.ptbr">Portuguese (Brazil)</option>
+              </select>
+            </section>
+
+            <section class="config-panel hidden" data-config-panel="sound">
+              <label class="checkbox-row" for="sound-enabled">
+                <input id="sound-enabled" type="checkbox" />
+                <span data-i18n="config.soundEnabled">Sound enabled</span>
+              </label>
+            </section>
+
+            <div class="config-footer">
+              <button class="small-btn" type="submit" data-i18n="config.save">Save</button>
+            </div>
+          </form>
+          <p id="config-status" class="window-meta"></p>
+        </div>
+        <div class="window-resize-handle" aria-hidden="true"></div>
+      </section>
+    </main>
+
+    <footer class="taskbar">
+      <div class="taskbar-left">
+        <button class="task-btn" type="button" data-open="friends" data-i18n="task.friends">Friend List</button>
+        <button class="task-btn" type="button" data-open="game" data-i18n="task.game">Game Preview</button>
+        <button class="task-btn" id="task-notifications" type="button" data-open="notifications">
+          <span data-i18n="task.notifications">Notifications</span>
+          <span id="notification-badge" class="task-badge hidden">0</span>
+        </button>
+        <button class="task-btn" type="button" data-open="messages" data-i18n="task.messages">Message Box</button>
+        <button class="task-btn" type="button" data-open="feed" data-i18n="task.feed">Social Feed</button>
+        <button class="task-btn" type="button" data-open="configurations" data-i18n="task.config">Configurations</button>
+      </div>
+      <div class="taskbar-right">
+        <span id="clock" class="clock"></span>
+        <button id="logout" class="logout" type="button" data-i18n="auth.logout">Logout</button>
+      </div>
+    </footer>
+
+    <script type="module" src="/home.js"></script>
+  </body>
+</html>
