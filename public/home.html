@@ -110,6 +110,49 @@
         <div class="window-resize-handle" aria-hidden="true"></div>
       </section>
 
+      <section class="desktop-window" id="window-profile" data-window="profile" style="left: 66vw; top: 20vh; width: min(390px, 94vw); height: 380px">
+        <header class="window-titlebar">
+          <h2 data-i18n="window.profile">Profile Options</h2>
+          <div class="window-controls">
+            <button class="window-titlebtn window-minimize" type="button" data-minimize="profile" aria-label="Minimize Profile Options">-</button>
+            <button class="window-titlebtn window-maximize" type="button" data-maximize="profile" aria-label="Maximize Profile Options">□</button>
+            <button class="window-titlebtn window-close" type="button" data-close="profile" aria-label="Close Profile Options">x</button>
+          </div>
+        </header>
+        <div class="window-content profile-window">
+          <div class="profile-header">
+            <div id="profile-avatar-preview" class="profile-avatar" aria-hidden="true">
+              <span id="profile-avatar-fallback">?</span>
+            </div>
+            <div class="profile-actions">
+              <p class="window-meta" data-i18n="profile.subtitle">Update your name and icon.</p>
+              <button id="profile-avatar-button" class="small-btn" type="button" data-i18n="profile.changeIcon">Change icon</button>
+              <input id="profile-avatar-input" class="hidden-file-input" type="file" accept="image/png,image/jpeg" />
+            </div>
+          </div>
+
+          <form id="profile-form" class="profile-form">
+            <label for="profile-name" data-i18n="profile.name">Name</label>
+            <input id="profile-name" type="text" maxlength="24" autocomplete="username" />
+
+            <label for="profile-id" data-i18n="profile.id">ID</label>
+            <input id="profile-id" type="text" readonly />
+
+            <label for="profile-coins" data-i18n="profile.coins">Coins</label>
+            <input id="profile-coins" type="text" readonly />
+
+            <p class="window-meta profile-note" data-i18n="profile.note">Name changes affect login.</p>
+
+            <div class="profile-footer">
+              <button class="small-btn" type="submit" data-i18n="profile.save">Save profile</button>
+            </div>
+          </form>
+
+          <p id="profile-status" class="window-meta"></p>
+        </div>
+        <div class="window-resize-handle" aria-hidden="true"></div>
+      </section>
+
       <section class="desktop-window" id="window-configurations" data-window="configurations" style="left: 36vw; top: 52vh; width: min(430px, 96vw); height: 330px">
         <header class="window-titlebar">
           <h2 data-i18n="window.config">Configurations</h2>
@@ -124,6 +167,7 @@
             <div class="config-nav">
               <button type="button" class="config-tab active" data-config-section="personalize" data-i18n="config.section.personalize">Personalize</button>
               <button type="button" class="config-tab" data-config-section="language" data-i18n="config.section.language">Language</button>
+              <button type="button" class="config-tab" data-config-section="security" data-i18n="config.section.security">Privacy & Security</button>
               <button type="button" class="config-tab" data-config-section="sound" data-i18n="config.section.sound">Sound Options</button>
             </div>
 
@@ -146,6 +190,26 @@
               </select>
             </section>
 
+            <section class="config-panel hidden" data-config-panel="security">
+              <div id="security-form" class="security-form">
+                <label for="security-current-password" data-i18n="security.currentPassword">Current password</label>
+                <input id="security-current-password" type="password" autocomplete="current-password" />
+
+                <label for="security-next-password" data-i18n="security.nextPassword">New password</label>
+                <input id="security-next-password" type="password" autocomplete="new-password" />
+
+                <label for="security-confirm-password" data-i18n="security.confirmPassword">Confirm new password</label>
+                <input id="security-confirm-password" type="password" autocomplete="new-password" />
+
+                <p class="window-meta" data-i18n="security.note">You must confirm your current password before changing it.</p>
+
+                <div class="config-footer">
+                  <button id="security-save-btn" class="small-btn" type="button" data-i18n="security.save">Change password</button>
+                </div>
+              </div>
+              <p id="security-status" class="window-meta"></p>
+            </section>
+
             <section class="config-panel hidden" data-config-panel="sound">
               <label class="checkbox-row" for="sound-enabled">
                 <input id="sound-enabled" type="checkbox" />
@@ -163,6 +227,37 @@
       </section>
     </main>
 
+    <div id="avatar-editor-modal" class="avatar-editor-modal hidden" role="dialog" aria-modal="true" aria-labelledby="avatar-editor-title">
+      <div class="avatar-editor-backdrop" data-avatar-editor-close></div>
+      <section class="avatar-editor-window">
+        <header class="avatar-editor-titlebar">
+          <h2 id="avatar-editor-title" data-i18n="avatarEditor.title">Edit Image</h2>
+          <button id="avatar-editor-close" class="window-titlebtn window-close" type="button" aria-label="Close image editor">x</button>
+        </header>
+        <div class="avatar-editor-content">
+          <div id="avatar-editor-viewport" class="avatar-editor-viewport" aria-label="Avatar crop preview">
+            <img id="avatar-editor-image" alt="Avatar crop preview" draggable="false" />
+            <div class="avatar-editor-shade"></div>
+            <div class="avatar-editor-ring"></div>
+          </div>
+
+          <div class="profile-crop avatar-editor-controls">
+            <label for="profile-avatar-zoom" data-i18n="profile.crop">Crop size</label>
+            <div class="profile-crop-row">
+              <input id="profile-avatar-zoom" type="range" min="1" max="3" step="0.05" value="1" />
+              <span id="profile-avatar-zoom-value" class="profile-crop-value">100%</span>
+            </div>
+            <button id="profile-avatar-reset" class="small-btn tiny-btn" type="button" data-i18n="profile.resetCrop">Reset crop</button>
+            <p class="window-meta profile-crop-hint" data-i18n="profile.cropHint">Drag the image to position it inside the circle.</p>
+          </div>
+        </div>
+        <div class="avatar-editor-footer">
+          <button id="avatar-editor-cancel" class="small-btn" type="button" data-i18n="avatarEditor.cancel">Cancel</button>
+          <button id="avatar-editor-apply" class="small-btn" type="button" data-i18n="avatarEditor.apply">Apply</button>
+        </div>
+      </section>
+    </div>
+
     <footer class="taskbar">
       <div class="taskbar-left">
         <button class="task-btn" type="button" data-open="friends" data-i18n="task.friends">Friend List</button>
@@ -173,6 +268,7 @@
         </button>
         <button class="task-btn" type="button" data-open="messages" data-i18n="task.messages">Message Box</button>
         <button class="task-btn" type="button" data-open="feed" data-i18n="task.feed">Social Feed</button>
+        <button class="task-btn" type="button" data-open="profile" data-i18n="task.profile">Profile</button>
         <button class="task-btn" type="button" data-open="configurations" data-i18n="task.config">Configurations</button>
       </div>
       <div class="taskbar-right">

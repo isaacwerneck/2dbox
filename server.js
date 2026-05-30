@@ -37,8 +37,83 @@ function createDefaultDesktopData(userName) {
   };
 }
 
+function createDefaultProfile(userName) {
+  return {
+    displayName: userName,
+    avatarDataUrl: "",
+    coins: 0
+  };
+}
+
+function normalizeAvatarDataUrl(value) {
+  const candidate = (value || "").trim();
+  if (!candidate) {
+    return "";
+  }
+
+  return /^data:image\/(png|jpeg);base64,[a-z0-9+/=]+$/i.test(candidate) ? candidate : "";
+}
+
+function renameUserAcrossDb(db, oldName, nextName) {
+  const oldLower = oldName.toLowerCase();
+  const nextLower = nextName.toLowerCase();
+
+  db.users.forEach((user) => {
+    if (user.name.toLowerCase() === oldLower) {
+      user.name = nextName;
+    }
+
+    if (user.profile?.displayName && user.profile.displayName.toLowerCase() === oldLower) {
+      user.profile.displayName = nextName;
+    }
+
+    if (!user.desktopData) {
+      return;
+    }
+
+    user.desktopData.friends.forEach((friend) => {
+      if (friend.name.toLowerCase() === oldLower) {
+        friend.name = nextName;
+      }
+    });
+
+    user.desktopData.conversations.forEach((conversation) => {
+      if (conversation.with.toLowerCase() === oldLower) {
+        conversation.with = nextName;
+      }
+
+      conversation.messages.forEach((message) => {
+        if (message.from.toLowerCase() === oldLower) {
+          message.from = nextName;
+        }
+      });
+    });
+  });
+}
+
 function ensureUserState(user) {
   let changed = false;
+
+  if (!user.profile) {
+    user.profile = createDefaultProfile(user.name);
+    changed = true;
+  } else {
+    if (!user.profile.displayName) {
+      user.profile.displayName = user.name;
+      changed = true;
+    }
+
+    const normalizedAvatar = normalizeAvatarDataUrl(user.profile.avatarDataUrl);
+    if (user.profile.avatarDataUrl !== normalizedAvatar) {
+      user.profile.avatarDataUrl = normalizedAvatar;
+      changed = true;
+    }
+
+    if (!Number.isFinite(user.profile.coins)) {
+      user.profile.coins = 0;
+      changed = true;
+    }
+  }
 
   if (!user.desktopData) {
     user.desktopData = createDefaultDesktopData(user.name);
@@ -194,7 +269,8 @@ app.get("/api/session", async (req, res) => {
     const unreadNotifications = user.desktopData.notifications.filter((item) => !item.read).length;
 
     return res.json({
-      user: { name: user.name, createdAt: user.createdAt },
+      user: { id: user.id, name: user.name, createdAt: user.createdAt },
+      profile: user.profile,
       summary: {
         friendCount: user.desktopData.friends.filter((item) => item.status === "accepted").length,
         unreadNotifications,
@@ -204,6 +280,28 @@ app.get("/api/session", async (req, res) => {
     });
   } catch (_error) {
     return res.status(500).json({ error: "Unexpected error loading session." });
+  }
+});
+
+app.get("/api/profile", async (req, res) => {
+  try {
+    const name = getQueryName(req);
+    if (!name) {
+      return res.status(400).json({ error: "Name is required." });
+    }
+
+    const db = await readUsersDb();
+    const user = findUserByName(db, name);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    return res.json({
+      user: { id: user.id, name: user.name, createdAt: user.createdAt },
+      profile: user.profile
+    });
+  } catch (_error) {
+    return res.status(500).json({ error: "Unexpected error loading profile." });
   }
 });
 
@@ -650,6 +748,98 @@ app.post("/api/messages/delete", async (req, res) => {
   }
 });
 
+app.put("/api/profile", async (req, res) => {
+  try {
+    const name = (req.body?.name || "").trim();
+    const nextName = (req.body?.nextName || req.body?.displayName || "").trim();
+    const avatarDataUrl = normalizeAvatarDataUrl(req.body?.avatarDataUrl);
+
+    if (!name) {
+      return res.status(400).json({ error: "Name is required." });
+    }
+
+    const db = await readUsersDb();
+    const user = findUserByName(db, name);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const wantRename = Boolean(nextName) && nextName.toLowerCase() !== name.toLowerCase();
+
+    if (wantRename) {
+      if (nextName.length < 3) {
+        return res.status(400).json({ error: "Name must have at least 3 characters." });
+      }
+
+      const duplicate = db.users.find((candidate) => candidate.name.toLowerCase() === nextName.toLowerCase());
+      if (duplicate) {
+        return res.status(409).json({ error: "Name already exists." });
+      }
+
+      renameUserAcrossDb(db, user.name, nextName);
+    }
+
+    const updatedUser = findUserByName(db, wantRename ? nextName : name);
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    updatedUser.profile.displayName = wantRename ? nextName : (updatedUser.profile.displayName || updatedUser.name);
+
+    if (Object.prototype.hasOwnProperty.call(req.body || {}, "avatarDataUrl")) {
+      updatedUser.profile.avatarDataUrl = avatarDataUrl;
+    }
+
+    await writeUsersDb(db);
+
+    return res.json({
+      message: "Profile saved.",
+      user: { id: updatedUser.id, name: updatedUser.name, createdAt: updatedUser.createdAt },
+      profile: updatedUser.profile
+    });
+  } catch (_error) {
+    return res.status(500).json({ error: "Unexpected error saving profile." });
+  }
+});
+
+app.put("/api/security/password", async (req, res) => {
+  try {
+    const name = (req.body?.name || "").trim();
+    const currentPassword = (req.body?.currentPassword || "").trim();
+    const nextPassword = (req.body?.nextPassword || "").trim();
+
+    if (!name || !currentPassword || !nextPassword) {
+      return res.status(400).json({ error: "Name, currentPassword, and nextPassword are required." });
+    }
+
+    if (nextPassword.length < 4) {
+      return res.status(400).json({ error: "New password must have at least 4 characters." });
+    }
+
+    if (currentPassword === nextPassword) {
+      return res.status(409).json({ error: "New password must be different from the current password." });
+    }
+
+    const db = await readUsersDb();
+    const user = findUserByName(db, name);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: "Current password is incorrect." });
+    }
+
+    user.passwordHash = await bcrypt.hash(nextPassword, 10);
+    await writeUsersDb(db);
+
+    return res.json({ message: "Password updated." });
+  } catch (_error) {
+    return res.status(500).json({ error: "Unexpected error updating password." });
+  }
+});
+
 app.get("/api/feed", async (req, res) => {
   try {
     const name = getQueryName(req);
@@ -772,6 +962,7 @@ app.post("/api/register", async (req, res) => {
       name,
       passwordHash,
       createdAt: nowIso(),
+      profile: createDefaultProfile(name),
       desktopData: createDefaultDesktopData(name)
     });
 

@@ -13,12 +13,14 @@ const i18n = {
     "window.notifications": "Notifications",
     "window.messages": "Message Box",
     "window.feed": "Social Feed",
+    "window.profile": "Profile Options",
     "window.config": "Configurations",
     "task.friends": "Friend List",
     "task.game": "Game Preview",
     "task.notifications": "Notifications",
     "task.messages": "Message Box",
     "task.feed": "Social Feed",
+    "task.profile": "Profile",
     "task.config": "Configurations",
     "auth.logout": "Logout",
     "friend.search": "Search friend",
@@ -39,6 +41,21 @@ const i18n = {
     "friends.added": "Friend added.",
     "friends.inviteSent": "Invite sent.",
     "friends.empty": "No matching friends.",
+    "profile.subtitle": "Update your name and icon.",
+    "profile.changeIcon": "Change icon",
+    "profile.crop": "Crop size",
+    "profile.cropHint": "Drag the image to position it inside the circle.",
+    "profile.resetCrop": "Reset crop",
+    "profile.name": "Name",
+    "profile.id": "ID",
+    "profile.coins": "Coins",
+    "profile.note": "Name changes affect login.",
+    "profile.saving": "Saving profile...",
+    "profile.save": "Save profile",
+    "profile.saved": "Profile saved.",
+    "profile.iconHelp": "PNG or JPEG only.",
+    "profile.iconTooLarge": "Image must be under 1 MB.",
+    "profile.iconInvalidType": "Use a PNG or JPEG image.",
     "notifications.markAll": "Mark all as read",
     "notifications.clear": "Clear",
     "notifications.empty": "No notifications.",
@@ -74,6 +91,7 @@ const i18n = {
     "game.meta": "{theme} - Last park visit: {visit} - Visitors today: {visitors}",
     "config.section.personalize": "Personalize",
     "config.section.language": "Language",
+    "config.section.security": "Privacy & Security",
     "config.section.sound": "Sound Options",
     "config.wallpaper": "Wallpaper Color",
     "config.border": "Window Border Color",
@@ -83,8 +101,19 @@ const i18n = {
     "config.save": "Save",
     "config.saving": "Saving...",
     "config.saved": "Configurations saved.",
+    "security.currentPassword": "Current password",
+    "security.nextPassword": "New password",
+    "security.confirmPassword": "Confirm new password",
+    "security.note": "You must confirm your current password before changing it.",
+    "security.save": "Change password",
+    "security.saving": "Updating password...",
+    "security.saved": "Password updated.",
+    "security.passwordMismatch": "New password and confirmation do not match.",
     "language.english": "English",
     "language.ptbr": "Portuguese (Brazil)",
+    "avatarEditor.title": "Edit Image",
+    "avatarEditor.cancel": "Cancel",
+    "avatarEditor.apply": "Apply",
     "welcome.summary": "Logged as {name} - Friends: {friends} - Unread: {unread}"
   },
   "pt-BR": {
@@ -93,12 +122,14 @@ const i18n = {
     "window.notifications": "Notificacoes",
     "window.messages": "Caixa de Mensagens",
     "window.feed": "Feed Social",
+    "window.profile": "Perfil",
     "window.config": "Configuracoes",
     "task.friends": "Lista de Amigos",
     "task.game": "Previa do Jogo",
     "task.notifications": "Notificacoes",
     "task.messages": "Mensagens",
     "task.feed": "Feed Social",
+    "task.profile": "Perfil",
     "task.config": "Configuracoes",
     "auth.logout": "Sair",
     "friend.search": "Buscar amigo",
@@ -119,6 +150,21 @@ const i18n = {
     "friends.added": "Amigo adicionado.",
     "friends.inviteSent": "Convite enviado.",
     "friends.empty": "Nenhum amigo encontrado.",
+    "profile.subtitle": "Atualize seu nome e icone.",
+    "profile.changeIcon": "Trocar icone",
+    "profile.crop": "Tamanho do corte",
+    "profile.cropHint": "Arraste a imagem para posiciona-la dentro do circulo.",
+    "profile.resetCrop": "Redefinir corte",
+    "profile.name": "Nome",
+    "profile.id": "ID",
+    "profile.coins": "Moedas",
+    "profile.note": "Trocar o nome afeta o login.",
+    "profile.saving": "Salvando perfil...",
+    "profile.save": "Salvar perfil",
+    "profile.saved": "Perfil salvo.",
+    "profile.iconHelp": "Apenas PNG ou JPEG.",
+    "profile.iconTooLarge": "A imagem precisa ter menos de 1 MB.",
+    "profile.iconInvalidType": "Use uma imagem PNG ou JPEG.",
     "notifications.markAll": "Marcar todas como lidas",
     "notifications.clear": "Limpar",
     "notifications.empty": "Sem notificacoes.",
@@ -154,6 +200,7 @@ const i18n = {
     "game.meta": "{theme} - Ultima visita ao parque: {visit} - Visitantes hoje: {visitors}",
     "config.section.personalize": "Personalizar",
     "config.section.language": "Idioma",
+    "config.section.security": "Privacidade e Seguranca",
     "config.section.sound": "Opcoes de Som",
     "config.wallpaper": "Cor do Papel de Parede",
     "config.border": "Cor da Borda da Janela",
@@ -163,8 +210,19 @@ const i18n = {
     "config.save": "Salvar",
     "config.saving": "Salvando...",
     "config.saved": "Configuracoes salvas.",
+    "security.currentPassword": "Senha atual",
+    "security.nextPassword": "Nova senha",
+    "security.confirmPassword": "Confirmar nova senha",
+    "security.note": "Voce precisa confirmar sua senha atual antes de altera-la.",
+    "security.save": "Alterar senha",
+    "security.saving": "Atualizando senha...",
+    "security.saved": "Senha atualizada.",
+    "security.passwordMismatch": "A nova senha e a confirmacao nao coincidem.",
     "language.english": "Ingles",
     "language.ptbr": "Portugues (Brasil)",
+    "avatarEditor.title": "Editar imagem",
+    "avatarEditor.cancel": "Cancelar",
+    "avatarEditor.apply": "Aplicar",
     "welcome.summary": "Logado como {name} - Amigos: {friends} - Nao lidas: {unread}"
   }
 };
@@ -190,16 +248,42 @@ const deleteConversationBtn = document.getElementById("delete-conversation");
 const messagesList = document.getElementById("messages-list");
 const messageForm = document.getElementById("message-form");
 const messageInput = document.getElementById("message-input");
+const profileForm = document.getElementById("profile-form");
+const profileNameInput = document.getElementById("profile-name");
+const profileIdInput = document.getElementById("profile-id");
+const profileCoinsInput = document.getElementById("profile-coins");
+const profileAvatarPreview = document.getElementById("profile-avatar-preview");
+const profileAvatarFallback = document.getElementById("profile-avatar-fallback");
+const profileAvatarButton = document.getElementById("profile-avatar-button");
+const profileAvatarInput = document.getElementById("profile-avatar-input");
+const profileAvatarZoomInput = document.getElementById("profile-avatar-zoom");
+const profileAvatarZoomValue = document.getElementById("profile-avatar-zoom-value");
+const profileAvatarResetButton = document.getElementById("profile-avatar-reset");
+const avatarEditorModal = document.getElementById("avatar-editor-modal");
+const avatarEditorViewport = document.getElementById("avatar-editor-viewport");
+const avatarEditorImage = document.getElementById("avatar-editor-image");
+const avatarEditorRing = document.getElementById("avatar-editor-ring");
+const avatarEditorCloseButton = document.getElementById("avatar-editor-close");
+const avatarEditorCancelButton = document.getElementById("avatar-editor-cancel");
+const avatarEditorApplyButton = document.getElementById("avatar-editor-apply");
+const avatarEditorCloseTargets = Array.from(document.querySelectorAll("[data-avatar-editor-close]"));
+const profileStatus = document.getElementById("profile-status");
 const feedList = document.getElementById("social-feed-list");
 const gameZone = document.getElementById("game-zone");
 const gameMeta = document.getElementById("game-meta");
 const configForm = document.getElementById("config-form");
+const securityForm = document.getElementById("security-form");
+const securitySaveBtn = document.getElementById("security-save-btn");
 const wallpaperColorInput = document.getElementById("wallpaper-color");
 const borderColorInput = document.getElementById("border-color");
 const themeColorInput = document.getElementById("theme-color");
 const soundEnabledInput = document.getElementById("sound-enabled");
 const languageSelect = document.getElementById("language-select");
 const configStatus = document.getElementById("config-status");
+const securityCurrentPasswordInput = document.getElementById("security-current-password");
+const securityNextPasswordInput = document.getElementById("security-next-password");
+const securityConfirmPasswordInput = document.getElementById("security-confirm-password");
+const securityStatus = document.getElementById("security-status");
 const configTabs = Array.from(document.querySelectorAll("[data-config-section]"));
 const configPanels = Array.from(document.querySelectorAll("[data-config-panel]"));
 
@@ -211,6 +295,14 @@ const state = {
   notifications: [],
   feed: [],
   gamePreview: null,
+  profile: null,
+  profileAvatarSourceDataUrl: "",
+  profileAvatarDraft: "",
+  profileAvatarZoom: 1,
+  profileAvatarCropCenterX: 0,
+  profileAvatarCropCenterY: 0,
+  profileAvatarSourceWidth: 0,
+  profileAvatarSourceHeight: 0,
   themeColor: "#2f6eb1",
   soundEnabled: true,
   lastUnreadNotificationCount: 0,
@@ -226,6 +318,8 @@ let highestZ = 20;
 let audioContext = null;
 const layoutStorageKey = `desktopLayout:${userName}`;
 const FRIEND_OPTION_PREFIX = "friend:";
+let profileAvatarPreviewRenderToken = 0;
+let profileAvatarDragState = null;
 
 function getWorkspaceHeight() {
   return Math.max(180, window.innerHeight - 56);
@@ -793,7 +887,7 @@ function makeDraggable(win) {
   });
 
   bar.addEventListener("pointermove", (event) => {
-    if (!dragState || event.pointerId !== dragState.pointerId) {
+    if (!dragState || event.pointerId !== dragState.pointerId || event.buttons !== 1) {
       return;
     }
 
@@ -911,6 +1005,11 @@ function makeResizable(win) {
       return;
     }
 
+    if (event.target.closest(".window-titlebar")) {
+      win.style.cursor = "move";
+      return;
+    }
+
     updateHoverCursor(event);
   });
 
@@ -922,6 +1021,10 @@ function makeResizable(win) {
 
   win.addEventListener("pointerdown", (event) => {
     if (isWindowMaximized(win)) {
+      return;
+    }
+
+    if (event.target.closest(".window-titlebar")) {
       return;
     }
 
@@ -953,7 +1056,7 @@ function makeResizable(win) {
   });
 
   win.addEventListener("pointermove", (event) => {
-    if (!resizeState || event.pointerId !== resizeState.pointerId) {
+    if (!resizeState || event.pointerId !== resizeState.pointerId || event.buttons !== 1) {
       return;
     }
 
@@ -1012,8 +1115,9 @@ function makeResizable(win) {
 }
 
 function updateWelcome() {
+  const displayName = state.profile?.displayName || userName;
   welcomeText.textContent = tf("welcome.summary", {
-    name: userName,
+    name: displayName,
     friends: state.summary.friendCount,
     unread: state.summary.unreadNotifications
   });
@@ -1029,6 +1133,292 @@ function updateNotificationBadge(items) {
   } else {
     notificationBadge.classList.add("hidden");
   }
+}
+
+function getProfileInitials(name) {
+  const trimmed = (name || userName || "?").trim();
+  const parts = trimmed.split(/\s+/).filter(Boolean);
+  const initials = parts.slice(0, 2).map((part) => part[0]).join("");
+  return (initials || trimmed.slice(0, 2) || "?").toUpperCase();
+}
+
+function clampNumber(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function updateProfileZoomLabel() {
+  const zoomPercent = Math.round((state.profileAvatarZoom || 1) * 100);
+  profileAvatarZoomValue.textContent = `${zoomPercent}%`;
+  profileAvatarZoomInput.value = String(state.profileAvatarZoom || 1);
+}
+
+function getAvatarEditorViewportSize() {
+  return avatarEditorViewport?.getBoundingClientRect().width || 320;
+}
+
+function getAvatarCropMetrics() {
+  const sourceWidth = state.profileAvatarSourceWidth || 0;
+  const sourceHeight = state.profileAvatarSourceHeight || 0;
+
+  if (!sourceWidth || !sourceHeight) {
+    return null;
+  }
+
+  const zoom = clampNumber(Number(state.profileAvatarZoom) || 1, 1, 3);
+  const viewportSize = getAvatarEditorViewportSize();
+  const circleDiameter = avatarEditorRing?.getBoundingClientRect().width || viewportSize * 0.74;
+  const baseScale = viewportSize / Math.max(sourceWidth, sourceHeight);
+  const imageScale = Math.max(baseScale * zoom, circleDiameter / Math.min(sourceWidth, sourceHeight));
+  const circleRadius = circleDiameter / 2;
+  const cropHalfSize = circleRadius / imageScale;
+  const minCenterX = cropHalfSize;
+  const maxCenterX = sourceWidth - cropHalfSize;
+  const minCenterY = cropHalfSize;
+  const maxCenterY = sourceHeight - cropHalfSize;
+  const centerX = clampNumber(state.profileAvatarCropCenterX || sourceWidth / 2, minCenterX, maxCenterX);
+  const centerY = clampNumber(state.profileAvatarCropCenterY || sourceHeight / 2, minCenterY, maxCenterY);
+
+  return {
+    sourceWidth,
+    sourceHeight,
+    zoom,
+    viewportSize,
+    circleDiameter,
+    baseScale,
+    imageScale,
+    circleRadius,
+    cropHalfSize,
+    minCenterX,
+    maxCenterX,
+    minCenterY,
+    maxCenterY,
+    centerX,
+    centerY
+  };
+}
+
+function clampAvatarCenter(centerX, centerY) {
+  const metrics = getAvatarCropMetrics();
+  if (!metrics) {
+    return { centerX: 0, centerY: 0 };
+  }
+
+  return {
+    centerX: clampNumber(centerX, metrics.minCenterX, metrics.maxCenterX),
+    centerY: clampNumber(centerY, metrics.minCenterY, metrics.maxCenterY)
+  };
+}
+
+function resetAvatarCrop() {
+  if (!state.profileAvatarSourceWidth || !state.profileAvatarSourceHeight) {
+    return;
+  }
+
+  state.profileAvatarZoom = 1;
+  state.profileAvatarCropCenterX = state.profileAvatarSourceWidth / 2;
+  state.profileAvatarCropCenterY = state.profileAvatarSourceHeight / 2;
+  updateProfileZoomLabel();
+  refreshProfileAvatarPreview().catch(() => {
+    profileStatus.textContent = t("profile.iconHelp");
+  });
+}
+
+function setProfileAvatarSource(sourceDataUrl) {
+  state.profileAvatarSourceDataUrl = sourceDataUrl || "";
+  if (!state.profileAvatarSourceDataUrl) {
+    state.profileAvatarDraft = "";
+    profileAvatarZoomInput.disabled = true;
+    profileAvatarResetButton.disabled = true;
+    state.profileAvatarSourceWidth = 0;
+    state.profileAvatarSourceHeight = 0;
+    state.profileAvatarCropCenterX = 0;
+    state.profileAvatarCropCenterY = 0;
+    avatarEditorModal?.classList.add("hidden");
+    if (avatarEditorImage) {
+      avatarEditorImage.removeAttribute("src");
+      avatarEditorImage.style.width = "";
+      avatarEditorImage.style.height = "";
+      avatarEditorImage.style.left = "";
+      avatarEditorImage.style.top = "";
+      avatarEditorImage.style.transform = "";
+    }
+  }
+}
+
+function updateProfileAvatarDisplay() {
+  const avatarDataUrl = state.profileAvatarDraft || state.profile?.avatarDataUrl || "";
+
+  if (!avatarDataUrl) {
+    profileAvatarPreview.style.backgroundImage = "none";
+    profileAvatarPreview.style.backgroundSize = "cover";
+    profileAvatarPreview.style.backgroundPosition = "center";
+    profileAvatarPreview.classList.remove("has-image");
+    profileAvatarFallback.textContent = getProfileInitials(profileNameInput.value || userName);
+    return;
+  }
+
+  profileAvatarPreview.style.backgroundImage = `url(${avatarDataUrl})`;
+  profileAvatarPreview.style.backgroundSize = "cover";
+  profileAvatarPreview.style.backgroundPosition = "center";
+  profileAvatarPreview.classList.add("has-image");
+  profileAvatarFallback.textContent = "";
+}
+
+function openAvatarEditor() {
+  if (!state.profileAvatarSourceDataUrl) {
+    return;
+  }
+
+  avatarEditorModal?.classList.remove("hidden");
+  document.body.classList.add("avatar-editor-open");
+  refreshProfileAvatarPreview().catch(() => {
+    profileStatus.textContent = t("profile.iconHelp");
+  });
+}
+
+function closeAvatarEditor() {
+  avatarEditorModal?.classList.add("hidden");
+  document.body.classList.remove("avatar-editor-open");
+  state.profileAvatarSourceDataUrl = "";
+  state.profileAvatarSourceWidth = 0;
+  state.profileAvatarSourceHeight = 0;
+  state.profileAvatarCropCenterX = 0;
+  state.profileAvatarCropCenterY = 0;
+  state.profileAvatarZoom = 1;
+  profileAvatarInput.value = "";
+}
+
+function loadImageFromDataUrl(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Unable to load image file."));
+    image.src = dataUrl;
+  });
+}
+
+async function buildCroppedAvatarDataUrl(sourceDataUrl, zoom) {
+  const image = await loadImageFromDataUrl(sourceDataUrl);
+  const size = 256;
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("Unable to create image preview.");
+  }
+
+  canvas.width = size;
+  canvas.height = size;
+
+  const normalizedZoom = clampNumber(Number(zoom) || 1, 1, 3);
+  const viewportSize = getAvatarEditorViewportSize();
+  const circleDiameter = avatarEditorRing?.getBoundingClientRect().width || viewportSize * 0.74;
+  const baseScale = viewportSize / Math.max(image.width, image.height);
+  const imageScale = Math.max(baseScale * normalizedZoom, circleDiameter / Math.min(image.width, image.height));
+  const metrics = getAvatarCropMetrics();
+  const centerX = metrics?.centerX || image.width / 2;
+  const centerY = metrics?.centerY || image.height / 2;
+  const cropSize = circleDiameter / imageScale;
+  const sourceX = clampNumber(centerX - cropSize / 2, 0, image.width - cropSize);
+  const sourceY = clampNumber(centerY - cropSize / 2, 0, image.height - cropSize);
+
+  context.save();
+  context.beginPath();
+  context.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+  context.clip();
+  context.drawImage(image, sourceX, sourceY, cropSize, cropSize, 0, 0, size, size);
+  context.restore();
+  return canvas.toDataURL("image/png");
+}
+
+async function refreshProfileAvatarPreview() {
+  const sourceDataUrl = state.profileAvatarSourceDataUrl || state.profile?.avatarDataUrl || "";
+
+  if (!sourceDataUrl) {
+    state.profileAvatarDraft = "";
+    profileAvatarZoomInput.disabled = true;
+    profileAvatarResetButton.disabled = true;
+    if (avatarEditorImage) {
+      avatarEditorImage.removeAttribute("src");
+      avatarEditorImage.style.width = "";
+      avatarEditorImage.style.height = "";
+      avatarEditorImage.style.left = "";
+      avatarEditorImage.style.top = "";
+      avatarEditorImage.style.transform = "";
+    }
+    updateProfileZoomLabel();
+    return;
+  }
+
+  profileAvatarZoomInput.disabled = false;
+  profileAvatarResetButton.disabled = false;
+  const renderToken = ++profileAvatarPreviewRenderToken;
+  const image = await loadImageFromDataUrl(sourceDataUrl);
+
+  state.profileAvatarSourceWidth = image.width;
+  state.profileAvatarSourceHeight = image.height;
+  if (!state.profileAvatarCropCenterX) {
+    state.profileAvatarCropCenterX = image.width / 2;
+  }
+  if (!state.profileAvatarCropCenterY) {
+    state.profileAvatarCropCenterY = image.height / 2;
+  }
+
+  const metrics = getAvatarCropMetrics();
+  if (!metrics) {
+    return;
+  }
+
+  const previewSize = avatarEditorViewport?.getBoundingClientRect().width || 320;
+  const imageWidth = `${Math.round(metrics.sourceWidth * metrics.imageScale)}px`;
+  const imageHeight = `${Math.round(metrics.sourceHeight * metrics.imageScale)}px`;
+  const imageLeft = `${Math.round(previewSize / 2 - metrics.centerX * metrics.imageScale)}px`;
+  const imageTop = `${Math.round(previewSize / 2 - metrics.centerY * metrics.imageScale)}px`;
+
+  if (renderToken !== profileAvatarPreviewRenderToken) {
+    return;
+  }
+
+  if (avatarEditorImage) {
+    avatarEditorImage.src = sourceDataUrl;
+    avatarEditorImage.style.width = imageWidth;
+    avatarEditorImage.style.height = imageHeight;
+    avatarEditorImage.style.left = imageLeft;
+    avatarEditorImage.style.top = imageTop;
+    avatarEditorImage.style.transform = "";
+  }
+
+  updateProfileZoomLabel();
+}
+
+function renderProfile(profile, user = { id: "", name: userName }) {
+  state.profile = profile || { displayName: user.name || userName, avatarDataUrl: "", coins: 0 };
+  state.profileAvatarDraft = "";
+  state.profileAvatarSourceDataUrl = "";
+  state.profileAvatarSourceWidth = 0;
+  state.profileAvatarSourceHeight = 0;
+  state.profileAvatarCropCenterX = 0;
+  state.profileAvatarCropCenterY = 0;
+  state.profileAvatarZoom = 1;
+
+  const displayName = state.profile.displayName || user.name || userName;
+  profileNameInput.value = displayName;
+  profileIdInput.value = user.id || "";
+  profileCoinsInput.value = String(Number.isFinite(state.profile.coins) ? state.profile.coins : 0);
+
+  updateProfileAvatarDisplay();
+  updateProfileZoomLabel();
+
+  profileStatus.textContent = "";
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Unable to read image file."));
+    reader.readAsDataURL(file);
+  });
 }
 
 function currentFriendFilters() {
@@ -1326,8 +1716,9 @@ async function refreshSessionSummary() {
 async function loadWindowData() {
   const query = { name: userName };
 
-  const [session, friends, notifications, messages, feed, config, gamePreview] = await Promise.all([
+  const [session, profile, friends, notifications, messages, feed, config, gamePreview] = await Promise.all([
     apiRequest(buildQuery("/api/session", query)),
+    apiRequest(buildQuery("/api/profile", query)),
     apiRequest(buildQuery("/api/friends", query)),
     apiRequest(buildQuery("/api/notifications", query)),
     apiRequest(buildQuery("/api/messages", query)),
@@ -1338,9 +1729,11 @@ async function loadWindowData() {
 
   state.summary.friendCount = session.summary.friendCount;
   state.summary.unreadNotifications = session.summary.unreadNotifications;
+  state.profile = profile.profile || null;
   state.friends = friends.friends || [];
 
   applyConfig(config.config || {});
+  renderProfile(profile.profile || null, profile.user || session.user || { id: "", name: userName });
   updateWelcome();
   renderFriends();
   renderNotifications(notifications.notifications || []);
@@ -1489,6 +1882,77 @@ async function saveConfig(event) {
   configStatus.textContent = t("config.saved");
 }
 
+async function saveSecurity(event) {
+  event.preventDefault();
+
+  const currentPassword = securityCurrentPasswordInput.value.trim();
+  const nextPassword = securityNextPasswordInput.value.trim();
+  const confirmPassword = securityConfirmPasswordInput.value.trim();
+
+  if (!currentPassword || !nextPassword || !confirmPassword) {
+    securityStatus.textContent = t("security.currentPassword");
+    return;
+  }
+
+  if (nextPassword !== confirmPassword) {
+    securityStatus.textContent = t("security.passwordMismatch");
+    return;
+  }
+
+  securityStatus.textContent = t("security.saving");
+
+  await apiRequest("/api/security/password", {
+    method: "PUT",
+    body: JSON.stringify({
+      name: userName,
+      currentPassword,
+      nextPassword
+    })
+  });
+
+  securityCurrentPasswordInput.value = "";
+  securityNextPasswordInput.value = "";
+  securityConfirmPasswordInput.value = "";
+  securityStatus.textContent = t("security.saved");
+}
+
+async function saveProfile(event) {
+  event.preventDefault();
+
+  const nextName = profileNameInput.value.trim();
+  if (!nextName) {
+    profileStatus.textContent = t("profile.name");
+    return;
+  }
+
+  profileStatus.textContent = t("profile.saving");
+
+  const payload = {
+    name: userName,
+    nextName,
+    avatarDataUrl: state.profileAvatarDraft || state.profile?.avatarDataUrl || ""
+  };
+
+  const response = await apiRequest("/api/profile", {
+    method: "PUT",
+    body: JSON.stringify(payload)
+  });
+
+  const savedProfile = response.profile || {};
+  const savedUser = response.user || {};
+
+  if (savedUser.name && savedUser.name !== userName) {
+    localStorage.setItem("authUser", savedUser.name);
+    window.location.href = "/home.html";
+    return;
+  }
+
+  state.profileAvatarDraft = "";
+  renderProfile(savedProfile, savedUser);
+  profileStatus.textContent = t("profile.saved");
+  await refreshSessionSummary();
+}
+
 windows.forEach((win) => {
   makeDraggable(win);
   makeResizable(win);
@@ -1497,6 +1961,145 @@ windows.forEach((win) => {
     bringToFront(win);
     saveWindowLayout();
   });
+});
+
+profileAvatarButton.addEventListener("click", () => {
+  profileAvatarInput.click();
+});
+
+profileAvatarResetButton.addEventListener("click", () => {
+  resetAvatarCrop();
+});
+
+avatarEditorCloseButton.addEventListener("click", () => {
+  closeAvatarEditor();
+});
+
+avatarEditorCancelButton.addEventListener("click", () => {
+  closeAvatarEditor();
+});
+
+avatarEditorApplyButton.addEventListener("click", async () => {
+  if (!state.profileAvatarSourceDataUrl) {
+    return;
+  }
+
+  state.profileAvatarDraft = await buildCroppedAvatarDataUrl(state.profileAvatarSourceDataUrl, state.profileAvatarZoom || 1);
+  updateProfileAvatarDisplay();
+  closeAvatarEditor();
+});
+
+avatarEditorCloseTargets.forEach((node) => {
+  node.addEventListener("click", () => {
+    closeAvatarEditor();
+  });
+});
+
+function startAvatarCropDrag(event) {
+  if (event.button !== 0 || !state.profileAvatarSourceDataUrl) {
+    return;
+  }
+
+  const metrics = getAvatarCropMetrics();
+  if (!metrics) {
+    return;
+  }
+
+  const clampedCenter = clampAvatarCenter(metrics.centerX, metrics.centerY);
+
+  profileAvatarDragState = {
+    isDragging: true,
+    startX: event.clientX,
+    startY: event.clientY,
+    startCenterX: clampedCenter.centerX,
+    startCenterY: clampedCenter.centerY,
+    imageScale: metrics.imageScale,
+    minCenterX: metrics.minCenterX,
+    maxCenterX: metrics.maxCenterX,
+    minCenterY: metrics.minCenterY,
+    maxCenterY: metrics.maxCenterY
+  };
+
+  avatarEditorViewport.classList.add("dragging");
+  event.preventDefault();
+}
+
+avatarEditorViewport.addEventListener("mousedown", startAvatarCropDrag);
+
+function stopAvatarCropDrag() {
+  if (!profileAvatarDragState) {
+    return;
+  }
+
+  profileAvatarDragState.isDragging = false;
+  profileAvatarDragState = null;
+  avatarEditorViewport.classList.remove("dragging");
+}
+
+document.addEventListener("mousemove", async (event) => {
+  if (!profileAvatarDragState || !profileAvatarDragState.isDragging) {
+    return;
+  }
+
+  const dx = event.clientX - profileAvatarDragState.startX;
+  const dy = event.clientY - profileAvatarDragState.startY;
+
+  const nextCenter = clampAvatarCenter(
+    profileAvatarDragState.startCenterX - dx / profileAvatarDragState.imageScale,
+    profileAvatarDragState.startCenterY - dy / profileAvatarDragState.imageScale
+  );
+
+  state.profileAvatarCropCenterX = nextCenter.centerX;
+  state.profileAvatarCropCenterY = nextCenter.centerY;
+
+  await refreshProfileAvatarPreview();
+});
+
+document.addEventListener("mouseup", stopAvatarCropDrag);
+avatarEditorViewport.addEventListener("mouseleave", stopAvatarCropDrag);
+
+profileAvatarZoomInput.addEventListener("input", async () => {
+  state.profileAvatarZoom = clampNumber(Number(profileAvatarZoomInput.value) || 1, 1, 3);
+  updateProfileZoomLabel();
+
+  if (!state.profileAvatarSourceDataUrl && !state.profile?.avatarDataUrl) {
+    return;
+  }
+
+  try {
+    await refreshProfileAvatarPreview();
+  } catch (error) {
+    profileStatus.textContent = error.message;
+  }
+});
+
+profileAvatarInput.addEventListener("change", async () => {
+  const file = profileAvatarInput.files?.[0];
+  if (!file) {
+    return;
+  }
+
+  if (file.size > 1024 * 1024) {
+    profileStatus.textContent = t("profile.iconTooLarge");
+    profileAvatarInput.value = "";
+    return;
+  }
+
+  if (!["image/png", "image/jpeg"].includes(file.type)) {
+    profileStatus.textContent = t("profile.iconInvalidType");
+    profileAvatarInput.value = "";
+    return;
+  }
+
+  const dataUrl = await readFileAsDataUrl(file);
+  setProfileAvatarSource(dataUrl);
+  state.profileAvatarZoom = 1;
+  state.profileAvatarCropCenterX = 0;
+  state.profileAvatarCropCenterY = 0;
+  profileAvatarInput.value = "";
+
+  openAvatarEditor();
+  profileStatus.textContent = t("profile.iconHelp");
 });
 
 restoreWindowLayout();
@@ -1708,11 +2311,31 @@ messageForm.addEventListener("submit", async (event) => {
   }
 });
 
+profileForm.addEventListener("submit", async (event) => {
+  try {
+    await saveProfile(event);
+  } catch (error) {
+    profileStatus.textContent = error.message;
+  }
+});
+
+profileAvatarZoomInput.addEventListener("change", () => {
+  updateProfileZoomLabel();
+});
+
 configForm.addEventListener("submit", async (event) => {
   try {
     await saveConfig(event);
   } catch (error) {
     configStatus.textContent = error.message;
+  }
+});
+
+securitySaveBtn.addEventListener("click", async () => {
+  try {
+    await saveSecurity({ preventDefault() {} });
+  } catch (error) {
+    securityStatus.textContent = error.message;
   }
 });
 
