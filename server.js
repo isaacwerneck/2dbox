@@ -8,6 +8,238 @@ const START_PORT = Number(process.env.PORT) || 3000;
 const MAX_PORT_TRIES = 20;
 const DB_PATH = path.join(__dirname, "data", "users.json");
 
+function repeatRow(pattern, count) {
+  return pattern.repeat(count);
+}
+
+function createParkRows() {
+  const width = 40;
+  const rows = Array.from({ length: 24 }, () => Array.from({ length: width }, () => "G"));
+
+  for (let x = 0; x < width; x += 1) {
+    rows[0][x] = "H";
+    rows[1][x] = "H";
+    rows[22][x] = "W";
+    rows[23][x] = "W";
+  }
+
+  for (let y = 0; y < rows.length; y += 1) {
+    rows[y][0] = y >= 20 ? "W" : "H";
+    rows[y][width - 1] = y >= 20 ? "W" : "H";
+  }
+
+  for (let x = 4; x <= 35; x += 1) {
+    rows[11][x] = "P";
+  }
+
+  for (let y = 4; y <= 19; y += 1) {
+    rows[y][19] = "P";
+    rows[y][20] = "P";
+  }
+
+  for (let x = 2; x <= 37; x += 1) {
+    rows[20][x] = "D";
+    rows[21][x] = "D";
+  }
+
+  for (let y = 5; y <= 9; y += 1) {
+    rows[y][6] = "P";
+    rows[y][7] = "P";
+    rows[y][8] = "P";
+    rows[y][30] = "P";
+    rows[y][31] = "P";
+    rows[y][32] = "P";
+  }
+
+  for (let x = 12; x <= 15; x += 1) {
+    rows[6][x] = "S";
+    rows[7][x] = "S";
+  }
+
+  for (let x = 24; x <= 28; x += 1) {
+    rows[14][x] = "S";
+    rows[15][x] = "S";
+  }
+
+  rows[10][19] = "S";
+  rows[10][20] = "S";
+  rows[11][18] = "S";
+  rows[11][19] = "S";
+  rows[11][20] = "S";
+  rows[11][21] = "S";
+  rows[12][18] = "S";
+  rows[12][19] = "S";
+  rows[12][20] = "S";
+  rows[12][21] = "S";
+  rows[13][19] = "S";
+  rows[13][20] = "S";
+
+  for (let y = 2; y <= 18; y += 1) {
+    rows[y][2] = "H";
+    rows[y][37] = "H";
+  }
+
+  return rows.map((row) => row.join(""));
+}
+
+function createParkFeatures() {
+  return [
+    // Trees scattered naturally across the four quadrants
+    { type: "tree", x: 4, y: 2, size: "l" },
+    { type: "tree", x: 10, y: 3, size: "m" },
+    { type: "tree", x: 16, y: 2, size: "m" },
+    { type: "tree", x: 22, y: 2, size: "l" },
+    { type: "tree", x: 30, y: 3, size: "m" },
+    { type: "tree", x: 36, y: 4, size: "l" },
+    { type: "tree", x: 3, y: 16, size: "m" },
+    { type: "tree", x: 14, y: 17, size: "m" },
+    { type: "tree", x: 27, y: 17, size: "l" },
+    { type: "tree", x: 36, y: 15, size: "m" },
+    { type: "tree", x: 3, y: 9, size: "m" },
+    { type: "tree", x: 37, y: 9, size: "m" },
+    // Benches flanking the path intersection
+    { type: "bench", x: 14, y: 10, facing: "south" },
+    { type: "bench", x: 22, y: 10, facing: "south" },
+    { type: "bench", x: 7, y: 12, facing: "north" },
+    { type: "bench", x: 31, y: 12, facing: "north" },
+    // Street lamps
+    { type: "lamp", x: 8, y: 10 },
+    { type: "lamp", x: 18, y: 6 },
+    { type: "lamp", x: 30, y: 10 },
+    { type: "lamp", x: 18, y: 18 },
+    // Compact flowerbeds (4×3 tiles)
+    { type: "flowerbed", x: 11, y: 5, w: 4, h: 3, palette: "pink" },
+    { type: "flowerbed", x: 23, y: 14, w: 4, h: 3, palette: "sun" },
+    // Fountain positioned above the horizontal path
+    { type: "fountain", x: 17, y: 8, w: 4, h: 3 },
+    // Gazebo in NW corner
+    { type: "gazebo", x: 4, y: 5, w: 5, h: 5 },
+    // Buildings — well-spaced in each quadrant
+    { type: "building", x: 26, y: 4, w: 8, h: 6, style: "cafe", label: "Petal Cafe" },
+    { type: "building", x: 4, y: 13, w: 7, h: 5, style: "arcade", label: "Code Shop" },
+    { type: "building", x: 28, y: 13, w: 7, h: 5, style: "house", label: "Lake House" },
+    { type: "dock", x: 12, y: 20, w: 16, h: 2 },
+    { type: "banner", x: 18, y: 3, text: "Spring Event" },
+    { type: "portal-sign", x: 33, y: 11, text: "Snow Market" }
+  ];
+}
+
+function createParkBlockedAreas() {
+  return [
+    { x: 5, y: 6, w: 3, h: 3 },   // Gazebo interior
+    { x: 27, y: 5, w: 6, h: 4 },  // Petal Cafe
+    { x: 5, y: 14, w: 5, h: 3 },  // Code Shop
+    { x: 29, y: 14, w: 5, h: 3 }, // Lake House
+    { x: 17, y: 8, w: 4, h: 3 },  // Fountain basin
+    { x: 12, y: 5, w: 3, h: 2 },  // Pink flowerbed
+    { x: 24, y: 14, w: 3, h: 2 }  // Sun flowerbed
+  ];
+}
+
+const GAME_WORLD = {
+  harbor: {
+    id: "harbor",
+    name: "Bloom Park",
+    theme: "Festival Garden",
+    visitorsToday: 63,
+    spawn: { x: 8, y: 11 },
+    tiles: createParkRows(),
+    features: createParkFeatures(),
+    blockedAreas: createParkBlockedAreas(),
+    portals: [
+      { x: 35, y: 11, targetZoneId: "market", targetX: 2, targetY: 9, label: "Snow Market" }
+    ]
+  },
+  market: {
+    id: "market",
+    name: "Snow Market",
+    theme: "Winter Trade Route",
+    visitorsToday: 27,
+    spawn: { x: 2, y: 9 },
+    tiles: [
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSPPPPPPPPSSSS",
+      "SSSPPPPPPPPPPSSS",
+      "SSSPPSSSSSSPPSSS",
+      "SSSPPSSSSSSPPSSS",
+      "SSSPPPPPPPPPPSSS",
+      "PPPPPPPPPPPPPPPP",
+      "WWWWWWWWWWWWWWWW",
+      "WWWWWWWWWWWWWWWW"
+    ],
+    features: [],
+    blockedAreas: [],
+    portals: [
+      { x: 0, y: 9, targetZoneId: "harbor", targetX: 34, targetY: 11, label: "Bloom Park" },
+      { x: 15, y: 5, targetZoneId: "garden", targetX: 1, targetY: 5, label: "Garden Lane" }
+    ]
+  },
+  garden: {
+    id: "garden",
+    name: "Garden Lane",
+    theme: "Classic Meadow",
+    visitorsToday: 11,
+    spawn: { x: 1, y: 5 },
+    tiles: [
+      "GGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGG",
+      "GGGPPPGGGGGPPPGG",
+      "GGPPPPPGGGPPPPGG",
+      "PPPPPPPPPPPPPPPP",
+      "GGPPPPPGGGPPPPGG",
+      "GGGPPPGGGGGPPPGG",
+      "GGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGG",
+      "GGGGGGGGGGGGGGGG"
+    ],
+    features: [],
+    blockedAreas: [],
+    portals: [
+      { x: 0, y: 5, targetZoneId: "market", targetX: 14, targetY: 5, label: "Snow Market" },
+      { x: 15, y: 5, targetZoneId: "cat_house", targetX: 2, targetY: 9, label: "Midnight House" }
+    ]
+  },
+  cat_house: {
+    id: "cat_house",
+    name: "Midnight House",
+    theme: "Moon Cat Salon",
+    visitorsToday: 6,
+    spawn: { x: 2, y: 9 },
+    tiles: [
+      "WWWWWWWWWWWWWWWW",
+      "WFFFFFFFFFFFFFFW",
+      "WFFFFFFFFFFFFFFW",
+      "WFFRRRRRRRRRRFFW",
+      "WFFRRRRRRRRRRFFW",
+      "WFFRRRRRRRRRRFFW",
+      "WFFRRRRRRRRRRFFW",
+      "WFFFFFFFFFFFFFFW",
+      "WFFFFFFFFFFFFFFW",
+      "PPFFFFFFFFFFFFFW",
+      "WFFFFFFFFFFFFFFW",
+      "WWWWWWWWWWWWWWWW"
+    ],
+    features: [],
+    blockedAreas: [],
+    portals: [
+      { x: 0, y: 9, targetZoneId: "garden", targetX: 14, targetY: 5, label: "Garden Lane" }
+    ]
+  }
+};
+
+const PASSABLE_TILES = new Set(["G", "P", "D", "S", "F", "R"]);
+const DIRECTION_VECTORS = {
+  up: { x: 0, y: -1 },
+  down: { x: 0, y: 1 },
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 }
+};
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -16,6 +248,8 @@ function nowIso() {
 }
 
 function createDefaultDesktopData(userName) {
+  const gameState = createDefaultGameState();
+
   return {
     friends: [],
     notifications: [],
@@ -23,17 +257,36 @@ function createDefaultDesktopData(userName) {
     feed: [],
     config: {
       wallpaperColor: "#3f76bf",
+      windowBgColor: "#f2f4f8",
       borderColor: "#0f2b4a",
       themeColor: "#2f6eb1",
+      textColor: "#16202b",
+      gameBackdropColor: "#b7dced",
       soundEnabled: true,
       language: "en"
     },
     gamePreview: {
-      zone: "Starter House",
-      lastParkVisit: "Today",
-      houseTheme: "Blue Classic",
-      visitorsToday: 3
-    }
+      zone: "Harbor Docks",
+      lastParkVisit: "Now",
+      houseTheme: "Emerald Harbor",
+      visitorsToday: 18
+    },
+    gameState
+  };
+}
+
+function createDefaultGameState() {
+  const zone = GAME_WORLD.harbor;
+
+  return {
+    zoneId: zone.id,
+    x: zone.spawn.x,
+    y: zone.spawn.y,
+    direction: "down",
+    running: false,
+    sessionStartedAt: "",
+    lastSeenAt: nowIso(),
+    lastSavedAt: nowIso()
   };
 }
 
@@ -52,6 +305,173 @@ function normalizeAvatarDataUrl(value) {
   }
 
   return /^data:image\/(png|jpeg);base64,[a-z0-9+/=]+$/i.test(candidate) ? candidate : "";
+}
+
+function getZoneById(zoneId) {
+  return GAME_WORLD[zoneId] || GAME_WORLD.harbor;
+}
+
+function getTileAt(zone, x, y) {
+  if (!zone || y < 0 || y >= zone.tiles.length) {
+    return "";
+  }
+
+  const row = zone.tiles[y] || "";
+  if (x < 0 || x >= row.length) {
+    return "";
+  }
+
+  return row[x];
+}
+
+function isBlockedByArea(zone, x, y) {
+  return (zone?.blockedAreas || []).some((area) => {
+    return x >= area.x && x < area.x + area.w && y >= area.y && y < area.y + area.h;
+  });
+}
+
+function isWalkableTile(zone, x, y) {
+  return PASSABLE_TILES.has(getTileAt(zone, x, y)) && !isBlockedByArea(zone, x, y);
+}
+
+function buildGamePreview(gameState) {
+  const zone = getZoneById(gameState?.zoneId);
+  const lastSavedAt = gameState?.lastSavedAt ? new Date(gameState.lastSavedAt) : null;
+
+  return {
+    zone: zone.name,
+    lastParkVisit: lastSavedAt && Number.isFinite(lastSavedAt.getTime()) ? lastSavedAt.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "Now",
+    houseTheme: zone.theme,
+    visitorsToday: zone.visitorsToday
+  };
+}
+
+function normalizeGameState(gameState) {
+  const fallback = createDefaultGameState();
+  const nextState = gameState && typeof gameState === "object" ? { ...fallback, ...gameState } : fallback;
+  const zone = getZoneById(nextState.zoneId);
+
+  nextState.zoneId = zone.id;
+  nextState.direction = DIRECTION_VECTORS[nextState.direction] ? nextState.direction : fallback.direction;
+  nextState.running = Boolean(nextState.running);
+  nextState.sessionStartedAt = typeof nextState.sessionStartedAt === "string" ? nextState.sessionStartedAt : "";
+  nextState.lastSeenAt = typeof nextState.lastSeenAt === "string" && nextState.lastSeenAt ? nextState.lastSeenAt : nowIso();
+  nextState.lastSavedAt = typeof nextState.lastSavedAt === "string" && nextState.lastSavedAt ? nextState.lastSavedAt : nowIso();
+
+  nextState.x = Number.isInteger(nextState.x) ? nextState.x : zone.spawn.x;
+  nextState.y = Number.isInteger(nextState.y) ? nextState.y : zone.spawn.y;
+
+  if (!isWalkableTile(zone, nextState.x, nextState.y)) {
+    nextState.x = zone.spawn.x;
+    nextState.y = zone.spawn.y;
+  }
+
+  return nextState;
+}
+
+function touchGameSession(user, { running = user.desktopData.gameState?.running ?? false } = {}) {
+  const nextState = normalizeGameState(user.desktopData.gameState);
+  const timestamp = nowIso();
+
+  nextState.running = running;
+  nextState.lastSeenAt = timestamp;
+
+  if (running && !nextState.sessionStartedAt) {
+    nextState.sessionStartedAt = timestamp;
+  }
+
+  if (!running) {
+    nextState.sessionStartedAt = "";
+  }
+
+  user.desktopData.gameState = nextState;
+  user.desktopData.gamePreview = buildGamePreview(nextState);
+}
+
+function serializeGameSession(user, db) {
+  const gameState = normalizeGameState(user.desktopData.gameState);
+  const zone = getZoneById(gameState.zoneId);
+
+  user.desktopData.gameState = gameState;
+  user.desktopData.gamePreview = buildGamePreview(gameState);
+
+  // Count users actively in the same zone, seen within the last 5 minutes
+  const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
+  const nowMs = Date.now();
+  const onlineInZone = db
+    ? (db.users || []).filter((u) => {
+        const gs = u.desktopData?.gameState;
+        if (!gs?.running || gs.zoneId !== zone.id) return false;
+        const lastSeen = gs.lastSeenAt ? new Date(gs.lastSeenAt).getTime() : 0;
+        return (nowMs - lastSeen) <= ONLINE_THRESHOLD_MS;
+      }).length
+    : 1;
+
+  return {
+    player: {
+      name: user.profile?.displayName || user.name,
+      avatarDataUrl: user.profile?.avatarDataUrl || "",
+      position: {
+        zoneId: gameState.zoneId,
+        x: gameState.x,
+        y: gameState.y,
+        direction: gameState.direction
+      },
+      running: gameState.running,
+      sessionStartedAt: gameState.sessionStartedAt,
+      lastSeenAt: gameState.lastSeenAt,
+      lastSavedAt: gameState.lastSavedAt
+    },
+    zone: {
+      id: zone.id,
+      name: zone.name,
+      theme: zone.theme,
+      visitorsToday: onlineInZone,
+      width: zone.tiles[0].length,
+      height: zone.tiles.length,
+      tiles: zone.tiles,
+      features: zone.features || [],
+      portals: zone.portals
+    },
+    gamePreview: user.desktopData.gamePreview
+  };
+}
+
+function movePlayer(user, direction) {
+  const vector = DIRECTION_VECTORS[direction];
+  const nextState = normalizeGameState(user.desktopData.gameState);
+
+  if (!vector) {
+    return nextState;
+  }
+
+  const zone = getZoneById(nextState.zoneId);
+  const nextX = nextState.x + vector.x;
+  const nextY = nextState.y + vector.y;
+
+  nextState.direction = direction;
+
+  if (!isWalkableTile(zone, nextX, nextY)) {
+    nextState.lastSeenAt = nowIso();
+    return nextState;
+  }
+
+  nextState.x = nextX;
+  nextState.y = nextY;
+
+  const portal = zone.portals.find((item) => item.x === nextX && item.y === nextY);
+  if (portal) {
+    const targetZone = getZoneById(portal.targetZoneId);
+    nextState.zoneId = targetZone.id;
+    nextState.x = portal.targetX;
+    nextState.y = portal.targetY;
+  }
+
+  nextState.running = true;
+  nextState.lastSeenAt = nowIso();
+  nextState.lastSavedAt = nextState.lastSeenAt;
+
+  return normalizeGameState(nextState);
 }
 
 function renameUserAcrossDb(db, oldName, nextName) {
@@ -143,7 +563,16 @@ function ensureUserState(user) {
   }
 
   if (!desktopData.config) {
-    desktopData.config = { wallpaperColor: "#3f76bf", borderColor: "#0f2b4a", themeColor: "#2f6eb1", soundEnabled: true, language: "en" };
+    desktopData.config = {
+      wallpaperColor: "#3f76bf",
+      windowBgColor: "#f2f4f8",
+      borderColor: "#0f2b4a",
+      themeColor: "#2f6eb1",
+      textColor: "#16202b",
+      gameBackdropColor: "#b7dced",
+      soundEnabled: true,
+      language: "en"
+    };
     changed = true;
   } else {
     if (!desktopData.config.borderColor) {
@@ -151,8 +580,23 @@ function ensureUserState(user) {
       changed = true;
     }
 
+    if (!desktopData.config.windowBgColor || !/^#[0-9a-fA-F]{6}$/.test(desktopData.config.windowBgColor)) {
+      desktopData.config.windowBgColor = "#f2f4f8";
+      changed = true;
+    }
+
     if (!desktopData.config.themeColor) {
       desktopData.config.themeColor = "#2f6eb1";
+      changed = true;
+    }
+
+    if (!desktopData.config.textColor || !/^#[0-9a-fA-F]{6}$/.test(desktopData.config.textColor)) {
+      desktopData.config.textColor = "#16202b";
+      changed = true;
+    }
+
+    if (!desktopData.config.gameBackdropColor || !/^#[0-9a-fA-F]{6}$/.test(desktopData.config.gameBackdropColor)) {
+      desktopData.config.gameBackdropColor = "#b7dced";
       changed = true;
     }
 
@@ -164,7 +608,19 @@ function ensureUserState(user) {
   }
 
   if (!desktopData.gamePreview) {
-    desktopData.gamePreview = { zone: "Starter House", lastParkVisit: "Today", houseTheme: "Blue Classic", visitorsToday: 0 };
+    desktopData.gamePreview = { zone: "Harbor Docks", lastParkVisit: "Now", houseTheme: "Emerald Harbor", visitorsToday: 18 };
+    changed = true;
+  }
+
+  const normalizedGameState = normalizeGameState(desktopData.gameState);
+  if (JSON.stringify(desktopData.gameState) !== JSON.stringify(normalizedGameState)) {
+    desktopData.gameState = normalizedGameState;
+    changed = true;
+  }
+
+  const preview = buildGamePreview(desktopData.gameState);
+  if (JSON.stringify(desktopData.gamePreview) !== JSON.stringify(preview)) {
+    desktopData.gamePreview = preview;
     changed = true;
   }
 
@@ -894,11 +1350,23 @@ app.put("/api/config", async (req, res) => {
 
     const nextConfig = {
       wallpaperColor: req.body?.wallpaperColor || user.desktopData.config.wallpaperColor,
+      windowBgColor:
+        typeof req.body?.windowBgColor === "string" && /^#[0-9a-fA-F]{6}$/.test(req.body.windowBgColor)
+          ? req.body.windowBgColor
+          : user.desktopData.config.windowBgColor || "#f2f4f8",
       borderColor: req.body?.borderColor || user.desktopData.config.borderColor || "#0f2b4a",
       themeColor:
         typeof req.body?.themeColor === "string" && /^#[0-9a-fA-F]{6}$/.test(req.body.themeColor)
           ? req.body.themeColor
           : user.desktopData.config.themeColor || "#2f6eb1",
+      textColor:
+        typeof req.body?.textColor === "string" && /^#[0-9a-fA-F]{6}$/.test(req.body.textColor)
+          ? req.body.textColor
+          : user.desktopData.config.textColor || "#16202b",
+      gameBackdropColor:
+        typeof req.body?.gameBackdropColor === "string" && /^#[0-9a-fA-F]{6}$/.test(req.body.gameBackdropColor)
+          ? req.body.gameBackdropColor
+          : user.desktopData.config.gameBackdropColor || "#b7dced",
       soundEnabled: typeof req.body?.soundEnabled === "boolean" ? req.body.soundEnabled : user.desktopData.config.soundEnabled,
       language: normalizeLanguageValue(req.body?.language || user.desktopData.config.language)
     };
@@ -925,9 +1393,82 @@ app.get("/api/game-preview", async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    return res.json({ gamePreview: user.desktopData.gamePreview });
+    const session = serializeGameSession(user, db);
+    await writeUsersDb(db);
+
+    return res.json({ gamePreview: session.gamePreview });
   } catch (_error) {
     return res.status(500).json({ error: "Unexpected error loading game preview." });
+  }
+});
+
+app.get("/api/game-session", async (req, res) => {
+  try {
+    const name = getQueryName(req);
+    if (!name) {
+      return res.status(400).json({ error: "Name is required." });
+    }
+
+    const db = await readUsersDb();
+    const user = findUserByName(db, name);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const session = serializeGameSession(user, db);
+    await writeUsersDb(db);
+
+    return res.json({ game: session });
+  } catch (_error) {
+    return res.status(500).json({ error: "Unexpected error loading game session." });
+  }
+});
+
+app.post("/api/game-move", async (req, res) => {
+  try {
+    const name = (req.body?.name || "").trim();
+    const direction = (req.body?.direction || "").trim().toLowerCase();
+
+    if (!name || !direction) {
+      return res.status(400).json({ error: "Name and direction are required." });
+    }
+
+    const db = await readUsersDb();
+    const user = findUserByName(db, name);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    user.desktopData.gameState = movePlayer(user, direction);
+    touchGameSession(user, { running: true });
+    user.desktopData.gameState.lastSavedAt = nowIso();
+
+    await writeUsersDb(db);
+    return res.json({ game: serializeGameSession(user, db) });
+  } catch (_error) {
+    return res.status(500).json({ error: "Unexpected error moving player." });
+  }
+});
+
+app.post("/api/game-session/stop", async (req, res) => {
+  try {
+    const name = (req.body?.name || "").trim();
+    if (!name) {
+      return res.status(400).json({ error: "Name is required." });
+    }
+
+    const db = await readUsersDb();
+    const user = findUserByName(db, name);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    touchGameSession(user, { running: false });
+    await writeUsersDb(db);
+
+    return res.json({ message: "Game session stopped." });
+  } catch (_error) {
+    return res.status(500).json({ error: "Unexpected error stopping game session." });
   }
 });
 
@@ -957,13 +1498,20 @@ app.post("/api/register", async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const desktopData = createDefaultDesktopData(name);
+    desktopData.gameState.running = true;
+    desktopData.gameState.sessionStartedAt = nowIso();
+    desktopData.gameState.lastSeenAt = desktopData.gameState.sessionStartedAt;
+    desktopData.gameState.lastSavedAt = desktopData.gameState.sessionStartedAt;
+    desktopData.gamePreview = buildGamePreview(desktopData.gameState);
+
     db.users.push({
       id: Date.now().toString(),
       name,
       passwordHash,
       createdAt: nowIso(),
       profile: createDefaultProfile(name),
-      desktopData: createDefaultDesktopData(name)
+      desktopData
     });
 
     await writeUsersDb(db);
@@ -998,6 +1546,9 @@ app.post("/api/login", async (req, res) => {
     if (!isValidPassword) {
       return res.status(401).json({ error: "Invalid credentials." });
     }
+
+    touchGameSession(user, { running: true });
+    await writeUsersDb(db);
 
     return res.json({
       message: "Login successful.",

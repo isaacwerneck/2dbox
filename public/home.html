@@ -36,18 +36,24 @@
 
       <section class="desktop-window" id="window-game" data-window="game" style="left: 26vw; top: 12vh; width: min(560px, 94vw); height: 420px">
         <header class="window-titlebar">
-          <h2 data-i18n="window.game">Game Preview</h2>
+          <h2 data-i18n="window.game">Classic World</h2>
           <div class="window-controls">
-            <button class="window-titlebtn window-minimize" type="button" data-minimize="game" aria-label="Minimize Game Preview">-</button>
-            <button class="window-titlebtn window-maximize" type="button" data-maximize="game" aria-label="Maximize Game Preview">□</button>
-            <button class="window-titlebtn window-close" type="button" data-close="game" aria-label="Close Game Preview">x</button>
+            <button class="window-titlebtn window-minimize" type="button" data-minimize="game" aria-label="Minimize Classic World">-</button>
+            <button class="window-titlebtn window-maximize" type="button" data-maximize="game" aria-label="Maximize Classic World">□</button>
+            <button class="window-titlebtn window-close" type="button" data-close="game" aria-label="Close Classic World">x</button>
           </div>
         </header>
         <div class="window-content game-placeholder">
-          <div class="pixel-board">
-            <p id="game-zone" data-i18n="game.loadingZone">Loading zone...</p>
+          <div class="game-stage">
+            <canvas id="game-canvas" class="game-canvas" width="720" height="432" aria-label="Classic world map"></canvas>
+            <div class="game-stage-overlay">
+              <p id="game-zone" class="game-stage-title" data-i18n="game.loadingZone">Loading world...</p>
+              <p id="game-position" class="game-stage-subtitle">Zone: -- | X: -- | Y: --</p>
+            </div>
           </div>
-          <p class="window-meta" id="game-meta" data-i18n="game.loadingMeta">Loading game preview...</p>
+          <div class="game-hud">
+            <p class="window-meta" id="game-meta">Loading...</p>
+          </div>
         </div>
         <div class="window-resize-handle" aria-hidden="true"></div>
       </section>
@@ -175,11 +181,20 @@
               <label for="wallpaper-color" data-i18n="config.wallpaper">Wallpaper Color</label>
               <input id="wallpaper-color" type="color" value="#3f76bf" />
 
+              <label for="window-bg-color" data-i18n="config.windowBg">Window Background Color</label>
+              <input id="window-bg-color" type="color" value="#f2f4f8" />
+
               <label for="border-color" data-i18n="config.border">Window Border Color</label>
               <input id="border-color" type="color" value="#0f2b4a" />
 
               <label for="theme-color" data-i18n="config.theme">Theme Color</label>
               <input id="theme-color" type="color" value="#2f6eb1" />
+
+              <label for="text-color" data-i18n="config.text">Text Color</label>
+              <input id="text-color" type="color" value="#16202b" />
+
+              <label for="game-backdrop-color" data-i18n="config.gameBackdrop">Game Backdrop Color</label>
+              <input id="game-backdrop-color" type="color" value="#b7dced" />
             </section>
 
             <section class="config-panel hidden" data-config-panel="language">
@@ -261,7 +276,7 @@
     <footer class="taskbar">
       <div class="taskbar-left">
         <button class="task-btn" type="button" data-open="friends" data-i18n="task.friends">Friend List</button>
-        <button class="task-btn" type="button" data-open="game" data-i18n="task.game">Game Preview</button>
+        <button class="task-btn" type="button" data-open="game" data-i18n="task.game">Classic World</button>
         <button class="task-btn" id="task-notifications" type="button" data-open="notifications">
           <span data-i18n="task.notifications">Notifications</span>
           <span id="notification-badge" class="task-badge hidden">0</span>

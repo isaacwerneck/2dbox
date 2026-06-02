@@ -9,14 +9,14 @@ if (!userName) {
 const i18n = {
   en: {
     "window.friends": "Friend List",
-    "window.game": "Game Preview",
+    "window.game": "Classic World",
     "window.notifications": "Notifications",
     "window.messages": "Message Box",
     "window.feed": "Social Feed",
     "window.profile": "Profile Options",
     "window.config": "Configurations",
     "task.friends": "Friend List",
-    "task.game": "Game Preview",
+    "task.game": "Classic World",
     "task.notifications": "Notifications",
     "task.messages": "Message Box",
     "task.feed": "Social Feed",
@@ -86,16 +86,26 @@ const i18n = {
     "dynamic.message.parkSoon": "Park in 5 min?",
     "dynamic.message.joinSoon": "Yes, I will join.",
     "dynamic.message.updatedLayout": "I updated my room layout.",
-    "game.loadingZone": "Loading zone...",
-    "game.loadingMeta": "Loading game preview...",
-    "game.meta": "{theme} - Last park visit: {visit} - Visitors today: {visitors}",
+    "game.loadingZone": "Loading world...",
+    "game.loadingMeta": "Starting game session...",
+    "game.connecting": "Connecting world state...",
+    "game.meta": "{theme} - Online since: {since} - Visitors today: {visitors}",
+    "game.position": "Zone: {zone} | X: {x} | Y: {y}",
+    "game.help": "Move with WASD or arrow keys. Closing this window does not stop the session.",
+    "game.status.running": "Game running in background.",
+    "game.status.syncing": "Saving position...",
+    "game.status.portal": "Warped to {zone}.",
+    "game.status.offline": "Game session paused.",
     "config.section.personalize": "Personalize",
     "config.section.language": "Language",
     "config.section.security": "Privacy & Security",
     "config.section.sound": "Sound Options",
     "config.wallpaper": "Wallpaper Color",
+    "config.windowBg": "Window Background Color",
     "config.border": "Window Border Color",
     "config.theme": "Theme Color",
+    "config.text": "Text Color",
+    "config.gameBackdrop": "Game Backdrop Color",
     "config.language": "Language",
     "config.soundEnabled": "Sound enabled",
     "config.save": "Save",
@@ -118,14 +128,14 @@ const i18n = {
   },
   "pt-BR": {
     "window.friends": "Lista de Amigos",
-    "window.game": "Previa do Jogo",
+    "window.game": "Mundo Classico",
     "window.notifications": "Notificacoes",
     "window.messages": "Caixa de Mensagens",
     "window.feed": "Feed Social",
     "window.profile": "Perfil",
     "window.config": "Configuracoes",
     "task.friends": "Lista de Amigos",
-    "task.game": "Previa do Jogo",
+    "task.game": "Mundo Classico",
     "task.notifications": "Notificacoes",
     "task.messages": "Mensagens",
     "task.feed": "Feed Social",
@@ -195,16 +205,26 @@ const i18n = {
     "dynamic.message.parkSoon": "Parque em 5 min?",
     "dynamic.message.joinSoon": "Sim, eu vou entrar.",
     "dynamic.message.updatedLayout": "Atualizei o layout do meu quarto.",
-    "game.loadingZone": "Carregando area...",
-    "game.loadingMeta": "Carregando previa do jogo...",
-    "game.meta": "{theme} - Ultima visita ao parque: {visit} - Visitantes hoje: {visitors}",
+    "game.loadingZone": "Carregando mundo...",
+    "game.loadingMeta": "Iniciando sessao do jogo...",
+    "game.connecting": "Conectando estado do mundo...",
+    "game.meta": "{theme} - Online desde: {since} - Visitantes hoje: {visitors}",
+    "game.position": "Area: {zone} | X: {x} | Y: {y}",
+    "game.help": "Mova com WASD ou setas. Fechar esta janela nao para a sessao.",
+    "game.status.running": "Jogo rodando em segundo plano.",
+    "game.status.syncing": "Salvando posicao...",
+    "game.status.portal": "Teleportado para {zone}.",
+    "game.status.offline": "Sessao do jogo pausada.",
     "config.section.personalize": "Personalizar",
     "config.section.language": "Idioma",
     "config.section.security": "Privacidade e Seguranca",
     "config.section.sound": "Opcoes de Som",
     "config.wallpaper": "Cor do Papel de Parede",
+    "config.windowBg": "Cor do Fundo das Janelas",
     "config.border": "Cor da Borda da Janela",
     "config.theme": "Cor do Tema",
+    "config.text": "Cor do Texto",
+    "config.gameBackdrop": "Cor do Fundo do Jogo",
     "config.language": "Idioma",
     "config.soundEnabled": "Som ativado",
     "config.save": "Salvar",
@@ -269,14 +289,23 @@ const avatarEditorApplyButton = document.getElementById("avatar-editor-apply");
 const avatarEditorCloseTargets = Array.from(document.querySelectorAll("[data-avatar-editor-close]"));
 const profileStatus = document.getElementById("profile-status");
 const feedList = document.getElementById("social-feed-list");
+const gameStage = document.querySelector(".game-stage");
+const gameCanvas = document.getElementById("game-canvas");
+const gameContext = gameCanvas ? gameCanvas.getContext("2d") : null;
+const gameWindowTitle = document.querySelector("#window-game .window-titlebar h2");
+const gameTaskButton = document.querySelector(".task-btn[data-open='game']");
 const gameZone = document.getElementById("game-zone");
+const gamePosition = document.getElementById("game-position");
 const gameMeta = document.getElementById("game-meta");
 const configForm = document.getElementById("config-form");
 const securityForm = document.getElementById("security-form");
 const securitySaveBtn = document.getElementById("security-save-btn");
 const wallpaperColorInput = document.getElementById("wallpaper-color");
+const windowBgColorInput = document.getElementById("window-bg-color");
 const borderColorInput = document.getElementById("border-color");
 const themeColorInput = document.getElementById("theme-color");
+const textColorInput = document.getElementById("text-color");
+const gameBackdropColorInput = document.getElementById("game-backdrop-color");
 const soundEnabledInput = document.getElementById("sound-enabled");
 const languageSelect = document.getElementById("language-select");
 const configStatus = document.getElementById("config-status");
@@ -294,7 +323,26 @@ const state = {
   friendMode: "friends",
   notifications: [],
   feed: [],
+  gameSession: null,
   gamePreview: null,
+  gameMovePending: false,
+  gameLastMoveAt: 0,
+  gameLoopId: 0,
+  gameViewportWidth: 720,
+  gameViewportHeight: 432,
+  gameDpr: 1,
+  gameCameraX: 0,
+  gameCameraY: 0,
+  gameCameraReady: false,
+  playerRenderX: 0,
+  playerRenderY: 0,
+  playerStartX: 0,
+  playerStartY: 0,
+  playerTargetX: 0,
+  playerTargetY: 0,
+  playerTweenStartAt: 0,
+  playerTweenDurationMs: 170,
+  gameBackdropColor: "#b7dced",
   profile: null,
   profileAvatarSourceDataUrl: "",
   profileAvatarDraft: "",
@@ -304,6 +352,7 @@ const state = {
   profileAvatarSourceWidth: 0,
   profileAvatarSourceHeight: 0,
   themeColor: "#2f6eb1",
+  textColor: "#16202b",
   soundEnabled: true,
   lastUnreadNotificationCount: 0,
   hasLoadedNotifications: false,
@@ -318,6 +367,23 @@ let highestZ = 20;
 let audioContext = null;
 const layoutStorageKey = `desktopLayout:${userName}`;
 const FRIEND_OPTION_PREFIX = "friend:";
+const GAME_TILE_SIZE = 24;
+const GAME_CAMERA_LERP = 0.14;
+const GAME_MOVE_COOLDOWN_MS = 150;
+const GAME_KEY_TO_DIRECTION = {
+  ArrowUp: "up",
+  w: "up",
+  W: "up",
+  ArrowDown: "down",
+  s: "down",
+  S: "down",
+  ArrowLeft: "left",
+  a: "left",
+  A: "left",
+  ArrowRight: "right",
+  d: "right",
+  D: "right"
+};
 let profileAvatarPreviewRenderToken = 0;
 let profileAvatarDragState = null;
 
@@ -363,6 +429,10 @@ function maximizeWindow(win) {
   win.style.width = `${window.innerWidth}px`;
   win.style.height = `${getWorkspaceHeight()}px`;
   setMaximizeButtonState(win);
+
+  if (win.dataset.window === "game") {
+    window.requestAnimationFrame(resizeGameCanvas);
+  }
 }
 
 function restoreWindow(win) {
@@ -390,6 +460,10 @@ function restoreWindow(win) {
 
   keepInViewport(win);
   setMaximizeButtonState(win);
+
+  if (win.dataset.window === "game") {
+    window.requestAnimationFrame(resizeGameCanvas);
+  }
 }
 
 function toggleMaximizeWindow(win) {
@@ -618,6 +692,19 @@ function applyThemeColor(themeColor) {
   themeColorInput.value = base;
 }
 
+function applyTextColor(textColor) {
+  const base = normalizeHexColor(textColor, "#16202b");
+  const root = document.documentElement;
+
+  root.style.setProperty("--window-text", base);
+  root.style.setProperty("--window-meta-text", mixColors(base, "#ffffff", 0.22));
+  root.style.setProperty("--theme-board-text", mixColors(base, "#000000", 0.15));
+  root.style.setProperty("--theme-chip-text", mixColors(base, state.themeColor || "#2f6eb1", 0.25));
+
+  state.textColor = base;
+  textColorInput.value = base;
+}
+
 function t(key) {
   const lang = i18n[state.language] || i18n.en;
   return lang[key] || i18n.en[key] || key;
@@ -816,7 +903,23 @@ function applyLanguage(language) {
   }
 
   if (state.gamePreview) {
-    renderGamePreview(state.gamePreview);
+    renderGameSession(state.gameSession);
+  }
+
+  syncGameWindowLabels(state.gameSession?.zone?.name || "");
+}
+
+function syncGameWindowLabels(zoneName = "") {
+  const fallbackWindowTitle = t("window.game");
+  const fallbackTaskLabel = t("task.game");
+  const label = zoneName || fallbackWindowTitle;
+
+  if (gameWindowTitle) {
+    gameWindowTitle.textContent = label;
+  }
+
+  if (gameTaskButton) {
+    gameTaskButton.textContent = zoneName || fallbackTaskLabel;
   }
 }
 
@@ -1677,29 +1780,1221 @@ function renderFeed(items) {
     .join("");
 }
 
-function renderGamePreview(gamePreview) {
-  state.gamePreview = gamePreview;
-  gameZone.textContent = gamePreview.zone || t("game.loadingZone");
-  gameMeta.textContent = tf("game.meta", {
-    theme: gamePreview.houseTheme || "-",
-    visit: gamePreview.lastParkVisit || "-",
-    visitors: gamePreview.visitorsToday ?? 0
+function formatGameClock(value) {
+  if (!value) {
+    return "--";
+  }
+
+  const timestamp = new Date(value);
+  if (!Number.isFinite(timestamp.getTime())) {
+    return "--";
+  }
+
+  return timestamp.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function formatTimePlayed(startedAt) {
+  if (!startedAt) return "0m played";
+  const startMs = typeof startedAt === "number" ? startedAt : new Date(startedAt).getTime();
+  if (isNaN(startMs)) return "0m played";
+  const totalSec = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
+  const totalMin = Math.floor(totalSec / 60);
+  const sec = totalSec % 60;
+  if (totalMin < 60) return `${totalMin}m ${sec}s played`;
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return m > 0 ? `${h}h ${m}m played` : `${h}h played`;
+}
+
+function setGameStatus(text) {
+  gameMeta.textContent = text;
+}
+
+function getGameDirectionFromKey(key) {
+  return GAME_KEY_TO_DIRECTION[key] || "";
+}
+
+function isTypingTarget(target) {
+  return Boolean(target?.closest("input, textarea, select, [contenteditable='true']"));
+}
+
+function getTilePalette(tile) {
+  switch (tile) {
+    case "W":
+      return { base: "#3ab8e8", detail: "#1e90c0", shimmer: "#7ad8f8" };
+    case "D":
+      return { base: "#b88c58", detail: "#906838", light: "#d4a870" };
+    case "S":
+      return { base: "#9ab0c4", detail: "#6a8899", highlight: "#c8dce8" };
+    case "F":
+      return { base: "#c08040", detail: "#8a5820", light: "#e0a860" };
+    case "R":
+      return { base: "#d09860", detail: "#a87040", light: "#e8b878" };
+    case "H":
+      return { base: "#287038", detail: "#185028", bump: "#38904a" };
+    case "P":
+      return { base: "#c0946a", detail: "#9a7048", light: "#d8ae88" };
+    case "G":
+    default:
+      return { base: "#52b050", detail: "#3a8838", light: "#6ac868" };
+  }
+}
+
+function drawGameTile(ctx, tile, x, y, timestamp) {
+  const palette = getTilePalette(tile);
+  const drawX = x * GAME_TILE_SIZE;
+  const drawY = y * GAME_TILE_SIZE;
+  const T = GAME_TILE_SIZE;
+
+  // Base fill with slight overlap to prevent hairline seams
+  ctx.fillStyle = palette.base;
+  ctx.fillRect(drawX, drawY, T + 1, T + 1);
+
+  if (tile === "G") {
+    // Checkerboard 2-tone grass like references
+    const checker = ((x + y) % 2 === 0);
+    ctx.fillStyle = checker ? "rgba(90, 185, 80, 0.38)" : "rgba(42, 118, 48, 0.22)";
+    ctx.fillRect(drawX, drawY, T + 1, T + 1);
+    // Short grass blade details
+    const seed = (x * 7 + y * 13) % 5;
+    ctx.fillStyle = palette.detail;
+    ctx.fillRect(drawX + 3 + seed, drawY + T - 6, 1, 4);
+    ctx.fillRect(drawX + 9 + seed, drawY + T - 5, 1, 3);
+    ctx.fillRect(drawX + 17 + seed % 3, drawY + T - 7, 1, 5);
+    // Occasional tiny daisy on grass
+    if ((x * 3 + y * 11) % 9 === 0) {
+      ctx.fillStyle = "#f8f8e0";
+      ctx.fillRect(drawX + 11, drawY + 8, 2, 2);
+      ctx.fillStyle = "#f0c040";
+      ctx.fillRect(drawX + 12, drawY + 9, 1, 1);
+    }
+    return;
+  }
+
+  if (tile === "W") {
+    // Bright cyan water with animated shimmer
+    const t1 = Math.sin((timestamp / 380) + x * 0.9 + y * 0.5) * 2;
+    const t2 = Math.sin((timestamp / 320) + x * 0.4 + y * 0.8) * 1.5;
+    ctx.fillStyle = "rgba(255,255,255,0.22)";
+    ctx.fillRect(drawX + 2, drawY + 6 + t1, T - 4, 4);
+    ctx.fillRect(drawX + 5, drawY + 15 + t2, T - 10, 3);
+    // Sparkle
+    ctx.fillStyle = palette.shimmer;
+    ctx.fillRect(drawX + 4 + ((x * 5) % 8), drawY + 4, 2, 2);
+    return;
+  }
+
+  if (tile === "P") {
+    // Sandy dirt path — two-tone pebble texture from references
+    ctx.fillStyle = palette.light;
+    ctx.fillRect(drawX + 1, drawY + 1, T - 2, 4);
+    ctx.fillStyle = palette.detail;
+    // Scattered small pebble dots
+    const ps = (x * 11 + y * 7) % 6;
+    ctx.fillRect(drawX + 4 + ps, drawY + 8, 2, 2);
+    ctx.fillRect(drawX + 14 + (ps % 4), drawY + 16, 2, 2);
+    ctx.fillRect(drawX + 9, drawY + 6 + (ps % 5), 2, 2);
+    return;
+  }
+
+  if (tile === "D") {
+    // Dirt tile — darker than path, soil texture
+    ctx.fillStyle = palette.light;
+    ctx.fillRect(drawX + 2, drawY + 2, T - 4, 3);
+    ctx.fillStyle = palette.detail;
+    ctx.fillRect(drawX + 7, drawY + 11, 3, 2);
+    ctx.fillRect(drawX + 16, drawY + 7, 2, 3);
+    return;
+  }
+
+  if (tile === "S") {
+    // Stone cobble — rounded blocks like reference ruins
+    ctx.fillStyle = palette.highlight;
+    ctx.fillRect(drawX + 1, drawY + 1, T - 2, 2);
+    ctx.fillRect(drawX + 1, drawY + 1, 2, T - 2);
+    ctx.fillStyle = palette.detail;
+    ctx.fillRect(drawX + 1, drawY + T - 2, T - 2, 1);
+    ctx.fillRect(drawX + T - 2, drawY + 1, 1, T - 2);
+    // Inner cobble joints
+    ctx.fillStyle = "rgba(80, 110, 130, 0.4)";
+    ctx.fillRect(drawX + T / 2 - 1, drawY + 2, 1, T - 4);
+    ctx.fillRect(drawX + 2, drawY + T / 2 - 1, T - 4, 1);
+    return;
+  }
+
+  if (tile === "F") {
+    // Wood plank floor — horizontal planks with grain
+    ctx.fillStyle = palette.light;
+    ctx.fillRect(drawX + 1, drawY + 1, T - 2, 3);
+    ctx.fillStyle = palette.detail;
+    for (let py = 0; py < T; py += 8) {
+      ctx.fillRect(drawX, drawY + py + 7, T, 1);
+    }
+    // Plank grain dots
+    ctx.fillStyle = "rgba(120, 72, 28, 0.35)";
+    ctx.fillRect(drawX + 5, drawY + 3, 3, 1);
+    ctx.fillRect(drawX + 14, drawY + 11, 4, 1);
+    ctx.fillRect(drawX + 7, drawY + 19, 3, 1);
+    return;
+  }
+
+  if (tile === "R") {
+    // Interior room tile — warm wood/rug look
+    ctx.fillStyle = palette.light;
+    ctx.fillRect(drawX + 1, drawY + 1, T - 2, 2);
+    ctx.fillStyle = "rgba(160, 100, 50, 0.25)";
+    ctx.fillRect(drawX + 3, drawY + 3, T - 6, T - 6);
+    ctx.fillStyle = palette.detail;
+    ctx.fillRect(drawX, drawY + 7, T, 1);
+    ctx.fillRect(drawX, drawY + 15, T, 1);
+    return;
+  }
+
+  if (tile === "H") {
+    // Hedge / dark grass — bumpy top edge
+    ctx.fillStyle = palette.bump;
+    ctx.fillRect(drawX + 2, drawY, 4, 5);
+    ctx.fillRect(drawX + 9, drawY - 1, 5, 6);
+    ctx.fillRect(drawX + 17, drawY, 4, 4);
+    ctx.fillStyle = palette.detail;
+    ctx.fillRect(drawX + 1, drawY + 4, T - 2, T - 4);
+  }
+}
+
+function drawPortalMarkers(ctx, portals, timestamp) {
+  portals.forEach((portal, index) => {
+    const pulse = 0.35 + ((Math.sin(timestamp / 180 + index) + 1) * 0.2);
+    ctx.fillStyle = `rgba(255, 241, 145, ${pulse})`;
+    ctx.fillRect(portal.x * GAME_TILE_SIZE + 4, portal.y * GAME_TILE_SIZE + 4, GAME_TILE_SIZE - 8, GAME_TILE_SIZE - 8);
+    ctx.strokeStyle = "rgba(173, 100, 18, 0.95)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(portal.x * GAME_TILE_SIZE + 5, portal.y * GAME_TILE_SIZE + 5, GAME_TILE_SIZE - 10, GAME_TILE_SIZE - 10);
   });
+}
+
+function drawRoundedRect(ctx, x, y, width, height, radius, fillStyle, strokeStyle = "") {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+
+  if (strokeStyle) {
+    ctx.strokeStyle = strokeStyle;
+    ctx.stroke();
+  }
+}
+
+function drawTree(ctx, feature, timestamp) {
+  const centerX = (feature.x * GAME_TILE_SIZE) + (GAME_TILE_SIZE / 2);
+  const baseY = (feature.y * GAME_TILE_SIZE) + GAME_TILE_SIZE;
+  const scale = feature.size === "l" ? 1.25 : feature.size === "m" ? 1 : 0.8;
+  const sway = Math.sin((timestamp / 600) + feature.x * 0.8) * 1.5;
+
+  // Ground shadow ellipse
+  ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+  ctx.beginPath();
+  ctx.ellipse(centerX + 2, baseY + 2, 13 * scale, 5 * scale, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Trunk — brown with lighter center stripe
+  const trunkW = Math.round(5 * scale);
+  const trunkH = Math.round(20 * scale);
+  ctx.fillStyle = "#6b4020";
+  ctx.fillRect(centerX - trunkW / 2, baseY - trunkH, trunkW, trunkH);
+  ctx.fillStyle = "#9a6838";
+  ctx.fillRect(centerX - 1, baseY - trunkH + 2, 2, trunkH - 4);
+
+  // Canopy — 3 layered circle clusters (dark → mid → bright) like references
+  const cy = baseY - trunkH - 4 * scale;
+  const cr = 14 * scale;
+
+  // Layer 1: darkest (shadow/depth)
+  ctx.fillStyle = "#1e5828";
+  ctx.beginPath();
+  ctx.arc(centerX - 7 * scale + sway, cy + 4 * scale, cr * 0.75, 0, Math.PI * 2);
+  ctx.arc(centerX + 6 * scale + sway, cy + 5 * scale, cr * 0.70, 0, Math.PI * 2);
+  ctx.arc(centerX + sway, cy + 3 * scale, cr * 0.80, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Layer 2: mid green (main canopy)
+  ctx.fillStyle = "#3a8838";
+  ctx.beginPath();
+  ctx.arc(centerX + sway, cy, cr, 0, Math.PI * 2);
+  ctx.arc(centerX - 9 * scale + sway, cy + 6 * scale, cr * 0.78, 0, Math.PI * 2);
+  ctx.arc(centerX + 9 * scale + sway, cy + 5 * scale, cr * 0.74, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Layer 3: bright green clusters (top highlights)
+  ctx.fillStyle = "#5ab850";
+  ctx.beginPath();
+  ctx.arc(centerX - 5 * scale + sway, cy - 4 * scale, cr * 0.55, 0, Math.PI * 2);
+  ctx.arc(centerX + 5 * scale + sway, cy - 2 * scale, cr * 0.50, 0, Math.PI * 2);
+  ctx.arc(centerX + sway, cy - 6 * scale, cr * 0.48, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Tiny highlight pixels (top-left of canopy)
+  ctx.fillStyle = "rgba(180, 240, 160, 0.70)";
+  ctx.fillRect(centerX - 6 * scale + sway, cy - 8 * scale, 3, 3);
+  ctx.fillRect(centerX + 3 * scale + sway, cy - 5 * scale, 2, 2);
+}
+
+function drawBench(ctx, feature) {
+  const left = feature.x * GAME_TILE_SIZE;
+  const top = feature.y * GAME_TILE_SIZE;
+
+  // Legs — dark wood, slightly angled base
+  ctx.fillStyle = "#5a3418";
+  ctx.fillRect(left + 5, top + 15, 3, 9);
+  ctx.fillRect(left + 20, top + 15, 3, 9);
+  ctx.fillStyle = "#7a4c28";
+  ctx.fillRect(left + 6, top + 15, 1, 9);
+  ctx.fillRect(left + 21, top + 15, 1, 9);
+
+  // Back rest — 2 planks
+  ctx.fillStyle = "#7a5030";
+  ctx.fillRect(left + 4, top + 7, 20, 4);
+  ctx.fillRect(left + 4, top + 12, 20, 3);
+  // Plank highlights (top edge)
+  ctx.fillStyle = "#b07848";
+  ctx.fillRect(left + 5, top + 7, 18, 1);
+  ctx.fillRect(left + 5, top + 12, 18, 1);
+  // Plank grain
+  ctx.fillStyle = "rgba(60, 30, 10, 0.30)";
+  ctx.fillRect(left + 10, top + 8, 1, 2);
+  ctx.fillRect(left + 17, top + 8, 1, 2);
+
+  // Seat plank
+  ctx.fillStyle = "#8a5c38";
+  ctx.fillRect(left + 3, top + 15, 22, 5);
+  ctx.fillStyle = "#c08850";
+  ctx.fillRect(left + 4, top + 15, 20, 1);
+}
+
+function drawLamp(ctx, feature, timestamp) {
+  const left = feature.x * GAME_TILE_SIZE;
+  const top = feature.y * GAME_TILE_SIZE;
+  const glow = 0.28 + ((Math.sin((timestamp / 360) + feature.x) + 1) * 0.12);
+
+  // Soft glow halo behind lantern
+  ctx.fillStyle = `rgba(255, 224, 100, ${glow * 0.45})`;
+  ctx.beginPath();
+  ctx.arc(left + 12, top + 6, 14, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Stone base — two stacked blocks
+  ctx.fillStyle = "#7a8e9e";
+  ctx.fillRect(left + 7, top + 20, 10, 5);
+  ctx.fillRect(left + 9, top + 16, 6, 5);
+  ctx.fillStyle = "#a0b4c4";
+  ctx.fillRect(left + 8, top + 20, 9, 1);
+  ctx.fillRect(left + 10, top + 16, 5, 1);
+
+  // Pole
+  ctx.fillStyle = "#5a6878";
+  ctx.fillRect(left + 11, top + 8, 2, 9);
+  ctx.fillStyle = "#7a8898";
+  ctx.fillRect(left + 11, top + 8, 1, 9);
+
+  // Lantern head — warm amber square lamp
+  ctx.fillStyle = "#5a4820";
+  ctx.fillRect(left + 7, top + 2, 10, 8);
+  ctx.fillStyle = `rgba(255, 210, 80, ${0.7 + glow * 0.3})`;
+  ctx.fillRect(left + 8, top + 3, 8, 6);
+  // Window shine
+  ctx.fillStyle = "rgba(255, 255, 200, 0.85)";
+  ctx.fillRect(left + 9, top + 3, 3, 2);
+  // Top cap
+  ctx.fillStyle = "#4a3818";
+  ctx.fillRect(left + 6, top + 1, 12, 2);
+}
+
+function drawFlowerbed(ctx, feature) {
+  const left = feature.x * GAME_TILE_SIZE;
+  const top = feature.y * GAME_TILE_SIZE;
+  const width = feature.w * GAME_TILE_SIZE;
+  const height = feature.h * GAME_TILE_SIZE;
+  const isSun = feature.palette === "sun";
+  const petalColors = isSun ? ["#f0b830", "#e87820", "#f04848"] : ["#f070a0", "#e8a0d0", "#f8d860"];
+
+  // Dirt border
+  ctx.fillStyle = "#8a6030";
+  ctx.fillRect(left, top, width, height);
+  // Inner soil
+  ctx.fillStyle = "#a07040";
+  ctx.fillRect(left + 2, top + 2, width - 4, height - 4);
+  // Green ground base
+  ctx.fillStyle = "#3a8838";
+  ctx.fillRect(left + 3, top + 3, width - 6, height - 6);
+
+  // Leaf clusters (sparser)
+  ctx.fillStyle = "#2e7030";
+  for (let fy = top + 6; fy < top + height - 4; fy += 13) {
+    for (let fx = left + 5; fx < left + width - 4; fx += 13) {
+      ctx.fillRect(fx, fy, 5, 5);
+    }
+  }
+
+  // Flower heads (sparser, wider spacing)
+  for (let fy = top + 9; fy < top + height - 5; fy += 17) {
+    for (let fx = left + 8; fx < left + width - 5; fx += 17) {
+      const ci = ((fx + fy) % 30) % petalColors.length;
+      ctx.fillStyle = petalColors[ci];
+      ctx.fillRect(fx - 1, fy, 4, 2);
+      ctx.fillRect(fx, fy - 1, 2, 4);
+      // Center dot
+      ctx.fillStyle = isSun ? "#fffaaa" : "#fffce0";
+      ctx.fillRect(fx, fy, 2, 2);
+    }
+  }
+}
+
+function drawFountain(ctx, feature, timestamp) {
+  const left = feature.x * GAME_TILE_SIZE;
+  const top = feature.y * GAME_TILE_SIZE;
+  const width = feature.w * GAME_TILE_SIZE;
+  const height = feature.h * GAME_TILE_SIZE;
+  const cx = left + width / 2;
+
+  // Outer stone basin wall
+  ctx.fillStyle = "#607890";
+  ctx.fillRect(left + 2, top + 4, width - 4, height - 6);
+  // Basin rim highlight (top + left)
+  ctx.fillStyle = "#98bcd4";
+  ctx.fillRect(left + 2, top + 4, width - 4, 3);
+  ctx.fillRect(left + 2, top + 4, 3, height - 6);
+  // Basin rim shadow (bottom + right)
+  ctx.fillStyle = "#3a5870";
+  ctx.fillRect(left + 2, top + height - 4, width - 4, 3);
+  ctx.fillRect(left + width - 5, top + 4, 3, height - 6);
+
+  // Inner water (stays well inside basin walls)
+  ctx.fillStyle = "#2ea8e0";
+  ctx.fillRect(left + 8, top + 10, width - 16, height - 18);
+  // Water surface shimmer
+  const sh = Math.sin(timestamp / 280) * 1.5;
+  ctx.fillStyle = "rgba(190, 240, 255, 0.55)";
+  ctx.fillRect(left + 10, top + 12 + sh, width - 20, 3);
+  ctx.fillStyle = "rgba(190, 240, 255, 0.30)";
+  ctx.fillRect(left + 10, top + 17 + sh * 0.5, (width - 20) * 0.55, 2);
+
+  // Center stone pillar
+  ctx.fillStyle = "#506a88";
+  ctx.fillRect(cx - 3, top + 8, 6, height - 16);
+  ctx.fillStyle = "#80a4c0";
+  ctx.fillRect(cx - 3, top + 8, 6, 2);
+  // Spout cap
+  ctx.fillStyle = "#90b8d0";
+  ctx.fillRect(cx - 5, top + 4, 10, 5);
+  ctx.fillStyle = "#b0d0e0";
+  ctx.fillRect(cx - 4, top + 4, 8, 2);
+
+  // Water arc droplets from spout
+  const dropAlpha = 0.55 + Math.sin(timestamp / 200) * 0.20;
+  ctx.fillStyle = `rgba(160, 230, 255, ${dropAlpha})`;
+  for (let i = 0; i < 4; i++) {
+    const phase = (timestamp / 260) + i * 1.57;
+    const dx = Math.cos(phase) * 5;
+    const dy = top + 5 - Math.abs(Math.sin(phase)) * 3;
+    ctx.fillRect(cx + dx - 1, dy, 2, 2);
+  }
+}
+
+function drawGazebo(ctx, feature) {
+  const left = feature.x * GAME_TILE_SIZE;
+  const top = feature.y * GAME_TILE_SIZE;
+  const width = feature.w * GAME_TILE_SIZE;
+  const height = feature.h * GAME_TILE_SIZE;
+
+  // Stone floor platform
+  ctx.fillStyle = "#9ab0c4";
+  ctx.fillRect(left + 4, top + height - 10, width - 8, 10);
+  ctx.fillStyle = "#c0d4e4";
+  ctx.fillRect(left + 4, top + height - 10, width - 8, 2);
+
+  // Wooden columns (left & right)
+  ctx.fillStyle = "#8a6040";
+  ctx.fillRect(left + 6, top + 14, 5, height - 24);
+  ctx.fillRect(left + width - 11, top + 14, 5, height - 24);
+  ctx.fillStyle = "#c09060";
+  ctx.fillRect(left + 7, top + 14, 2, height - 24);
+  ctx.fillRect(left + width - 10, top + 14, 2, height - 24);
+
+  // Interior wood floor — opaque
+  ctx.fillStyle = "#c09870";
+  ctx.fillRect(left + 10, top + 16, width - 20, height - 26);
+  ctx.fillStyle = "rgba(80, 40, 12, 0.20)";
+  for (let py = top + 21; py < top + height - 10; py += 6) {
+    ctx.fillRect(left + 10, py, width - 20, 1);
+  }
+
+  // Roof ridge — terracotta/red triangular
+  ctx.fillStyle = "#c04040";
+  ctx.beginPath();
+  ctx.moveTo(left + 2, top + 16);
+  ctx.lineTo(left + width / 2, top + 2);
+  ctx.lineTo(left + width - 2, top + 16);
+  ctx.closePath();
+  ctx.fill();
+  // Roof shadow underside
+  ctx.fillStyle = "#982828";
+  ctx.beginPath();
+  ctx.moveTo(left + 3, top + 16);
+  ctx.lineTo(left + width / 2, top + 10);
+  ctx.lineTo(left + width - 3, top + 16);
+  ctx.closePath();
+  ctx.fill();
+  // Roof highlight ridge line
+  ctx.fillStyle = "#e86060";
+  ctx.fillRect(left + width / 2 - 1, top + 2, 2, 14);
+}
+
+function drawBuilding(ctx, feature) {
+  const left = feature.x * GAME_TILE_SIZE;
+  const top = feature.y * GAME_TILE_SIZE;
+  const width = feature.w * GAME_TILE_SIZE;
+  const height = feature.h * GAME_TILE_SIZE;
+  const cx = left + width / 2;
+
+  // Per-style saturated colors
+  const roofMain  = feature.style === "cafe" ? "#d85f18" : feature.style === "arcade" ? "#2870b8" : "#a82020";
+  const roofDark  = feature.style === "cafe" ? "#a03e08" : feature.style === "arcade" ? "#1050a0" : "#801010";
+  const roofLight = feature.style === "cafe" ? "#f08030" : feature.style === "arcade" ? "#50a0e0" : "#d03030";
+  const wallMain  = feature.style === "cafe" ? "#c89838" : feature.style === "arcade" ? "#5888b0" : "#b86828";
+  const wallLight = feature.style === "cafe" ? "#e0b858" : feature.style === "arcade" ? "#78a8d0" : "#d08848";
+  const wallDark  = feature.style === "cafe" ? "#a07020" : feature.style === "arcade" ? "#386898" : "#8c4818";
+
+  const eaveY  = top + 20;
+  const wallH  = height - 20;
+
+  // ── WALL ──
+  ctx.fillStyle = wallMain;
+  ctx.fillRect(left + 2, eaveY, width - 4, wallH);
+  // Right-side depth shadow
+  ctx.fillStyle = wallDark;
+  ctx.fillRect(left + width - 7, eaveY, 5, wallH);
+  // Foundation strip
+  ctx.fillStyle = "#3a1c06";
+  ctx.fillRect(left + 2, top + height - 3, width - 4, 3);
+
+  // ── WINDOWS ──
+  const winY = eaveY + 16;
+  const winH = 12;
+  // Left window
+  ctx.fillStyle = "#1c68a8";
+  ctx.fillRect(left + 7, winY, 14, winH);
+  ctx.fillStyle = wallLight;
+  ctx.fillRect(left + 13, winY, 1, winH); // pane divider
+  ctx.fillStyle = "rgba(255,255,255,0.75)";
+  ctx.fillRect(left + 8, winY + 1, 4, 3); // shine
+  ctx.fillStyle = wallDark;
+  ctx.fillRect(left + 6, winY - 1, 16, 1);
+  ctx.fillRect(left + 6, winY + winH, 16, 1);
+  ctx.fillRect(left + 6, winY - 1, 1, winH + 2);
+  ctx.fillRect(left + 22, winY - 1, 1, winH + 2);
+  // Right window
+  ctx.fillStyle = "#1c68a8";
+  ctx.fillRect(left + width - 21, winY, 14, winH);
+  ctx.fillStyle = wallLight;
+  ctx.fillRect(left + width - 15, winY, 1, winH);
+  ctx.fillStyle = "rgba(255,255,255,0.75)";
+  ctx.fillRect(left + width - 20, winY + 1, 4, 3);
+  ctx.fillStyle = wallDark;
+  ctx.fillRect(left + width - 22, winY - 1, 16, 1);
+  ctx.fillRect(left + width - 22, winY + winH, 16, 1);
+  ctx.fillRect(left + width - 22, winY - 1, 1, winH + 2);
+  ctx.fillRect(left + width - 6, winY - 1, 1, winH + 2);
+
+  // ── DOOR ──
+  const dw = 14, dh = 20;
+  ctx.fillStyle = "#301406";
+  ctx.fillRect(cx - dw / 2, top + height - dh, dw, dh);
+  ctx.fillStyle = "#5a2e10";
+  ctx.fillRect(cx - dw / 2 + 2, top + height - dh + 2, dw / 2 - 2, dh - 4);
+  ctx.fillStyle = "#b87820";
+  ctx.fillRect(cx + 2, top + height - 9, 2, 2);
+
+  // ── CHIMNEY (house only) ──
+  if (feature.style === "house") {
+    ctx.fillStyle = "#786050";
+    ctx.fillRect(cx + 10, top + 6, 7, 13);
+    ctx.fillStyle = "#9a8070";
+    ctx.fillRect(cx + 11, top + 5, 5, 2);
+  }
+
+  // ── ROOF ──
+  ctx.fillStyle = roofMain;
+  ctx.beginPath();
+  ctx.moveTo(left - 2, eaveY);
+  ctx.lineTo(cx, top + 2);
+  ctx.lineTo(left + width + 2, eaveY);
+  ctx.closePath();
+  ctx.fill();
+  // Underside shadow triangle
+  ctx.fillStyle = roofDark;
+  ctx.beginPath();
+  ctx.moveTo(left, eaveY);
+  ctx.lineTo(cx, top + 11);
+  ctx.lineTo(left + width, eaveY);
+  ctx.closePath();
+  ctx.fill();
+  // Ridge highlight line
+  ctx.fillStyle = roofLight;
+  ctx.fillRect(cx - 1, top + 2, 2, 18);
+  // Horizontal tile stripes
+  ctx.fillStyle = "rgba(0,0,0,0.10)";
+  for (let ry = top + 5; ry < eaveY; ry += 4) {
+    const p = (ry - top - 2) / 18;
+    const hw = Math.round(p * (width / 2 + 2));
+    ctx.fillRect(cx - hw, ry, hw * 2, 1);
+  }
+  // Eave board
+  ctx.fillStyle = wallLight;
+  ctx.fillRect(left - 2, eaveY - 1, width + 4, 4);
+  ctx.fillStyle = wallDark;
+  ctx.fillRect(left - 2, eaveY + 2, width + 4, 1);
+
+  // ── SIGN (on wall, below eave) ──
+  if (feature.label) {
+    const sy = eaveY + 5;
+    ctx.fillStyle = "#b87018";
+    ctx.fillRect(left + 6, sy, width - 12, 10);
+    ctx.fillStyle = "rgba(255,240,150,0.22)";
+    ctx.fillRect(left + 7, sy + 1, width - 14, 3);
+    ctx.fillStyle = "#7a4408";
+    ctx.fillRect(left + 6, sy, width - 12, 1);
+    ctx.fillRect(left + 6, sy + 9, width - 12, 1);
+    ctx.fillStyle = "#120800";
+    ctx.font = "bold 7px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(feature.label.slice(0, 14), cx, sy + 8);
+  }
+}
+
+function drawDock(ctx, feature) {
+  const left = feature.x * GAME_TILE_SIZE;
+  const top = feature.y * GAME_TILE_SIZE;
+  const width = feature.w * GAME_TILE_SIZE;
+  const height = feature.h * GAME_TILE_SIZE;
+
+  // Dock planks — warm tan wood
+  ctx.fillStyle = "#b88c58";
+  ctx.fillRect(left, top + 2, width, height - 2);
+  // Top highlight
+  ctx.fillStyle = "#d4aa70";
+  ctx.fillRect(left, top + 2, width, 3);
+
+  // Plank dividers — horizontal
+  ctx.fillStyle = "rgba(90, 54, 18, 0.40)";
+  for (let py = top + 2; py < top + height; py += 8) {
+    ctx.fillRect(left, py + 7, width, 1);
+  }
+
+  // Support posts under dock edge
+  ctx.fillStyle = "#7a5028";
+  for (let px = left + 10; px < left + width; px += 16) {
+    ctx.fillRect(px, top, 4, 5);
+    ctx.fillStyle = "#a07040";
+    ctx.fillRect(px, top, 2, 5);
+    ctx.fillStyle = "#7a5028";
+  }
+
+  // Rope/chain line along edge
+  ctx.fillStyle = "rgba(90, 60, 20, 0.50)";
+  ctx.fillRect(left, top + 2, width, 1);
+}
+
+function drawBanner(ctx, feature, timestamp) {
+  const left = feature.x * GAME_TILE_SIZE;
+  const top = feature.y * GAME_TILE_SIZE;
+  const wave = Math.sin(timestamp / 280) * 2;
+
+  // Wooden support poles
+  ctx.fillStyle = "#7a5020";
+  ctx.fillRect(left + 1, top - 10, 4, 22);
+  ctx.fillRect(left + 24, top - 10, 4, 22);
+  // Pole highlight
+  ctx.fillStyle = "#a87840";
+  ctx.fillRect(left + 2, top - 10, 2, 22);
+  ctx.fillRect(left + 25, top - 10, 2, 22);
+
+  // Rope connecting poles
+  ctx.fillStyle = "#8a7040";
+  ctx.fillRect(left + 4, top - 8, 21, 1);
+
+  // Fabric banner body with wave
+  ctx.fillStyle = "#f0c040";
+  ctx.beginPath();
+  ctx.moveTo(left + 4, top - 6);
+  ctx.lineTo(left + 25, top - 4 + wave * 0.5);
+  ctx.lineTo(left + 25, top + 9 + wave);
+  ctx.lineTo(left + 4, top + 7);
+  ctx.closePath();
+  ctx.fill();
+  // Banner shadow stripe
+  ctx.fillStyle = "rgba(180, 120, 0, 0.35)";
+  ctx.fillRect(left + 5, top + 4 + wave * 0.5, 20, 3);
+  // Banner text
+  ctx.fillStyle = "#5a2010";
+  ctx.font = "bold 6px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText((feature.text || "").slice(0, 12), left + 15, top + 3 + wave * 0.3);
+}
+
+function drawPortalSign(ctx, feature) {
+  const left = feature.x * GAME_TILE_SIZE;
+  const top = feature.y * GAME_TILE_SIZE;
+
+  // Post
+  ctx.fillStyle = "#7a5020";
+  ctx.fillRect(left + 11, top + 10, 4, 18);
+  ctx.fillStyle = "#a87840";
+  ctx.fillRect(left + 12, top + 10, 2, 18);
+
+  // Arrow sign board (directional like reference)
+  ctx.fillStyle = "#c89448";
+  ctx.beginPath();
+  ctx.moveTo(left + 1, top + 4);
+  ctx.lineTo(left + 22, top + 4);
+  ctx.lineTo(left + 26, top + 10);
+  ctx.lineTo(left + 22, top + 16);
+  ctx.lineTo(left + 1, top + 16);
+  ctx.closePath();
+  ctx.fill();
+  // Sign outline
+  ctx.fillStyle = "#7a5820";
+  ctx.fillRect(left + 1, top + 4, 21, 1);
+  ctx.fillRect(left + 1, top + 15, 21, 1);
+  // Sign highlight
+  ctx.fillStyle = "#e8c070";
+  ctx.fillRect(left + 2, top + 5, 20, 2);
+  // Sign text
+  ctx.fillStyle = "#2a1a08";
+  ctx.font = "bold 6px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText((feature.text || "").slice(0, 10), left + 13, top + 13);
+}
+
+function drawFeature(ctx, feature, timestamp) {
+  switch (feature.type) {
+    case "tree":
+      drawTree(ctx, feature, timestamp);
+      break;
+    case "bench":
+      drawBench(ctx, feature);
+      break;
+    case "lamp":
+      drawLamp(ctx, feature, timestamp);
+      break;
+    case "flowerbed":
+      drawFlowerbed(ctx, feature);
+      break;
+    case "fountain":
+      drawFountain(ctx, feature, timestamp);
+      break;
+    case "gazebo":
+      drawGazebo(ctx, feature);
+      break;
+    case "building":
+      drawBuilding(ctx, feature);
+      break;
+    case "dock":
+      drawDock(ctx, feature);
+      break;
+    case "banner":
+      drawBanner(ctx, feature, timestamp);
+      break;
+    case "portal-sign":
+      drawPortalSign(ctx, feature);
+      break;
+    default:
+      break;
+  }
+}
+
+function drawAmbientParticles(ctx, zone, timestamp) {
+  const width = state.gameViewportWidth;
+  const height = state.gameViewportHeight;
+  ctx.save();
+  for (let index = 0; index < 24; index += 1) {
+    const phase = timestamp * 0.018 + (index * 17);
+    const x = ((phase * 0.8) + (index * 23)) % (width + 40) - 20;
+    const y = ((Math.sin((timestamp / 900) + index) * 0.5 + 0.5) * height * 0.8) + ((index * 29) % 36);
+    const size = 2 + (index % 3);
+    ctx.fillStyle = index % 2 === 0 ? "rgba(255, 214, 232, 0.72)" : "rgba(255, 245, 184, 0.68)";
+    ctx.beginPath();
+    ctx.ellipse(x, y % height, size, size * 0.7, Math.sin(index), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function getZonePixelSize(zone) {
+  return {
+    width: (zone?.tiles?.[0]?.length || 0) * GAME_TILE_SIZE,
+    height: (zone?.tiles?.length || 0) * GAME_TILE_SIZE
+  };
+}
+
+function getWorldRenderScale(zone) {
+  const zoneSize = getZonePixelSize(zone);
+  const viewportWidth = state.gameViewportWidth;
+  const viewportHeight = state.gameViewportHeight;
+
+  if (!zoneSize.width || !zoneSize.height || !viewportWidth || !viewportHeight) {
+    return 1;
+  }
+
+  const fitScale = Math.min(viewportWidth / zoneSize.width, viewportHeight / zoneSize.height);
+  return Math.max(1, fitScale * 1.45);
+}
+
+function getRenderedPlayerPosition(timestamp) {
+  if (!state.gameSession?.player?.position) {
+    return { x: 0, y: 0, direction: "down" };
+  }
+
+  const direction = state.gameSession.player.position.direction || "down";
+
+  if (!state.playerTweenStartAt || state.playerTweenDurationMs <= 0) {
+    return {
+      x: state.playerTargetX,
+      y: state.playerTargetY,
+      direction
+    };
+  }
+
+  const elapsed = timestamp - state.playerTweenStartAt;
+  const t = Math.min(1, Math.max(0, elapsed / state.playerTweenDurationMs));
+  const eased = 1 - ((1 - t) * (1 - t));
+
+  const x = state.playerStartX + ((state.playerTargetX - state.playerStartX) * eased);
+  const y = state.playerStartY + ((state.playerTargetY - state.playerStartY) * eased);
+
+  state.playerRenderX = x;
+  state.playerRenderY = y;
+
+  return { x, y, direction };
+}
+
+function drawPlayer(ctx, player, timestamp, renderPosition = null) {
+  const position = player?.position;
+  if (!position) {
+    return;
+  }
+
+  const activePosition = renderPosition || position;
+  const cx = activePosition.x * GAME_TILE_SIZE + GAME_TILE_SIZE / 2;
+  const cy = activePosition.y * GAME_TILE_SIZE + GAME_TILE_SIZE / 2;
+  const displayName = (player.name || userName).slice(0, 12);
+  const facing = activePosition.direction || "down";
+
+  // Walk animation only active while tween is running (not during idle)
+  const tweenElapsed = timestamp - (state.playerTweenStartAt || 0);
+  const isMoving = state.playerTweenStartAt > 0 && tweenElapsed < (state.playerTweenDurationMs + 100);
+  const walkCycle = isMoving ? Math.sin(timestamp / 130) : 0;
+  const bob = isMoving ? walkCycle * 0.9 : 0;
+  const legA = walkCycle * 3.5;   // front leg vertical offset
+  const legB = -walkCycle * 3.5;  // back leg (opposite phase)
+
+  // Ground shadow
+  ctx.fillStyle = "rgba(0, 0, 0, 0.18)";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 13, 9, 4, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Mirror left-facing using canvas transform so we only need one side-profile draw path
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (facing === "left") {
+    ctx.scale(-1, 1);
+  }
+
+  if (facing === "left" || facing === "right") {
+    // ── SIDE PROFILE ────────────────────────────────────
+    // Back leg (darker, behind body)
+    ctx.fillStyle = "#1e1208";
+    ctx.fillRect(0, 7 + bob + legB, 4, 7);
+    ctx.fillStyle = "#3a2818";
+    ctx.fillRect(1, 7 + bob + legB, 2, 2);
+
+    // Body side (narrower than front)
+    ctx.fillStyle = "#d04040";
+    ctx.fillRect(-5, -1 + bob, 11, 10);
+    ctx.fillStyle = "#e87070";
+    ctx.fillRect(-4, -1 + bob, 9, 2);   // collar
+    ctx.fillStyle = "#a02828";
+    ctx.fillRect(-5, 7 + bob, 11, 2);   // hem
+
+    // Back arm (behind body, muted)
+    ctx.fillStyle = "#c09870";
+    ctx.fillRect(-6, 1 + bob - walkCycle * 2.5, 3, 6);
+
+    // Front leg (in front of body)
+    ctx.fillStyle = "#2a1a0e";
+    ctx.fillRect(-4, 7 + bob + legA, 5, 7);
+    ctx.fillStyle = "#4a3020";
+    ctx.fillRect(-3, 7 + bob + legA, 3, 2);
+
+    // Front arm (in front of body)
+    ctx.fillStyle = "#e8b888";
+    ctx.fillRect(4, 1 + bob + walkCycle * 2.5, 3, 6);
+
+    // Head — side profile
+    const hy = -12 + bob;
+    ctx.fillStyle = "#f0c090";
+    ctx.fillRect(-6, hy, 13, 13);
+    ctx.fillStyle = "#f0a080";
+    ctx.fillRect(4, hy + 7, 2, 2);      // cheek
+    ctx.fillStyle = "#d89860";
+    ctx.fillRect(-5, hy + 11, 11, 2);   // jaw
+
+    // Hair — top + forward tuft
+    ctx.fillStyle = "#2e1e10";
+    ctx.fillRect(-7, hy - 5, 15, 8);
+    ctx.fillRect(-6, hy - 6, 13, 3);
+    ctx.fillRect(4, hy - 1, 4, 7);      // hair sticking forward
+    ctx.fillStyle = "#5a3820";
+    ctx.fillRect(-5, hy - 5, 11, 2);
+
+    // Single eye (facing right = left side of head in profile)
+    ctx.fillStyle = "#18100a";
+    ctx.fillRect(1, hy + 4, 3, 3);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(3, hy + 4, 1, 1);
+
+    // Nose tip
+    ctx.fillStyle = "#d89860";
+    ctx.fillRect(6, hy + 7, 2, 1);
+
+  } else if (facing === "up") {
+    // ── BACK VIEW ───────────────────────────────────────
+    // Legs
+    ctx.fillStyle = "#2a1a0e";
+    ctx.fillRect(-7, 7 + bob + legA, 5, 7);
+    ctx.fillRect(2, 7 + bob + legB, 5, 7);
+    ctx.fillStyle = "#4a3020";
+    ctx.fillRect(-6, 7 + bob + legA, 3, 2);
+    ctx.fillRect(3, 7 + bob + legB, 3, 2);
+
+    // Body back
+    ctx.fillStyle = "#d04040";
+    ctx.fillRect(-8, -1 + bob, 16, 10);
+    ctx.fillStyle = "#a02828";
+    ctx.fillRect(-8, 7 + bob, 16, 2);
+
+    // Arms
+    ctx.fillStyle = "#e8b888";
+    ctx.fillRect(-11, 1 + bob + legB * 0.5, 4, 7);
+    ctx.fillRect(7, 1 + bob + legA * 0.5, 4, 7);
+
+    // Head back — fully covered by hair
+    const hy = -12 + bob;
+    ctx.fillStyle = "#f0c090";
+    ctx.fillRect(-4, hy + 10, 8, 3);   // neck strip
+    ctx.fillStyle = "#2e1e10";
+    ctx.fillRect(-9, hy - 5, 18, 18);  // hair covers entire head
+    ctx.fillRect(-8, hy - 6, 16, 4);
+    ctx.fillRect(-10, hy - 1, 3, 9);   // left side tuft
+    ctx.fillRect(7, hy - 1, 3, 9);     // right side tuft
+    ctx.fillStyle = "#5a3820";
+    ctx.fillRect(-7, hy - 5, 14, 2);
+
+  } else {
+    // ── FRONT VIEW ──────────────────────────────────────
+    // Legs
+    ctx.fillStyle = "#2a1a0e";
+    ctx.fillRect(-7, 7 + bob + legA, 5, 7);
+    ctx.fillRect(2, 7 + bob + legB, 5, 7);
+    ctx.fillStyle = "#4a3020";
+    ctx.fillRect(-6, 7 + bob + legA, 3, 2);
+    ctx.fillRect(3, 7 + bob + legB, 3, 2);
+
+    // Body
+    ctx.fillStyle = "#d04040";
+    ctx.fillRect(-8, -1 + bob, 16, 10);
+    ctx.fillStyle = "#e87070";
+    ctx.fillRect(-7, -1 + bob, 14, 2);  // collar
+    ctx.fillStyle = "#a02828";
+    ctx.fillRect(-8, 7 + bob, 16, 2);   // hem
+    ctx.fillStyle = "rgba(0,0,0,0.10)";
+    ctx.fillRect(-1, -1 + bob, 2, 9);   // center seam
+
+    // Arms (swing opposite to legs)
+    ctx.fillStyle = "#e8b888";
+    ctx.fillRect(-11, 1 + bob + legA * 0.55, 4, 7);
+    ctx.fillRect(7, 1 + bob + legB * 0.55, 4, 7);
+
+    // Head
+    const hy = -12 + bob;
+    ctx.fillStyle = "#f0c090";
+    ctx.fillRect(-9, hy, 18, 14);
+    ctx.fillStyle = "#f0a080";
+    ctx.fillRect(-8, hy + 8, 3, 2);    // left cheek
+    ctx.fillRect(5, hy + 8, 3, 2);     // right cheek
+    ctx.fillStyle = "#d89860";
+    ctx.fillRect(-8, hy + 11, 16, 2);  // jaw
+
+    // Hair
+    ctx.fillStyle = "#2e1e10";
+    ctx.fillRect(-10, hy - 5, 20, 8);
+    ctx.fillRect(-9, hy - 6, 18, 3);
+    ctx.fillRect(-11, hy - 2, 3, 8);   // left tuft
+    ctx.fillRect(8, hy - 2, 3, 8);     // right tuft
+    ctx.fillStyle = "#5a3820";
+    ctx.fillRect(-8, hy - 5, 14, 2);
+
+    // Eyes
+    ctx.fillStyle = "#18100a";
+    ctx.fillRect(-5, hy + 4, 3, 3);
+    ctx.fillRect(2, hy + 4, 3, 3);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(-5, hy + 4, 1, 1);
+    ctx.fillRect(2, hy + 4, 1, 1);
+
+    // Nose + smile
+    ctx.fillStyle = "#d89860";
+    ctx.fillRect(-1, hy + 8, 2, 1);
+    ctx.fillStyle = "#c06050";
+    ctx.fillRect(-2, hy + 10, 4, 1);
+  }
+
+  ctx.restore();
+
+  // Nameplate drawn after restore so it is never flipped
+  const nameW = 52;
+  ctx.fillStyle = "rgba(14, 28, 45, 0.82)";
+  ctx.fillRect(cx - nameW / 2, cy - 30, nameW, 13);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 9px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(displayName, cx, cy - 21);
+}
+
+function getCameraOffset(zone, playerPosition, viewportWidth, viewportHeight) {
+  const zoneSize = getZonePixelSize(zone);
+  const mapWidth = zoneSize.width;
+  const mapHeight = zoneSize.height;
+  const playerCenterX = (playerPosition.x * GAME_TILE_SIZE) + (GAME_TILE_SIZE / 2);
+  const playerCenterY = (playerPosition.y * GAME_TILE_SIZE) + (GAME_TILE_SIZE / 2);
+  const maxOffsetX = Math.max(0, mapWidth - viewportWidth);
+  const maxOffsetY = Math.max(0, mapHeight - viewportHeight);
+
+  const offsetX = Math.min(Math.max(playerCenterX - (viewportWidth / 2), 0), maxOffsetX);
+  const offsetY = Math.min(Math.max(playerCenterY - (viewportHeight / 2), 0), maxOffsetY);
+
+  return { x: offsetX, y: offsetY };
+}
+
+function resizeGameCanvas() {
+  if (!gameCanvas || !gameStage || !gameContext) {
+    return;
+  }
+
+  const stageRect = gameStage.getBoundingClientRect();
+  const nextWidth = Math.floor(stageRect.width);
+  const nextHeight = Math.floor(stageRect.height);
+  const nextDpr = Math.min(3, Math.max(1, window.devicePixelRatio || 1));
+  const nextPixelWidth = Math.max(1, Math.floor(nextWidth * nextDpr));
+  const nextPixelHeight = Math.max(1, Math.floor(nextHeight * nextDpr));
+
+  if (nextWidth < 120 || nextHeight < 120) {
+    return;
+  }
+
+  if (
+    gameCanvas.width === nextPixelWidth
+    && gameCanvas.height === nextPixelHeight
+    && state.gameViewportWidth === nextWidth
+    && state.gameViewportHeight === nextHeight
+    && state.gameDpr === nextDpr
+  ) {
+    return;
+  }
+
+  gameCanvas.style.width = `${nextWidth}px`;
+  gameCanvas.style.height = `${nextHeight}px`;
+  gameCanvas.width = nextPixelWidth;
+  gameCanvas.height = nextPixelHeight;
+  state.gameViewportWidth = nextWidth;
+  state.gameViewportHeight = nextHeight;
+  state.gameDpr = nextDpr;
+  gameContext.setTransform(nextDpr, 0, 0, nextDpr, 0, 0);
+  gameContext.imageSmoothingEnabled = true;
+  gameContext.imageSmoothingQuality = "high";
+  state.gameCameraReady = false;
+}
+
+function updateSmoothCamera(targetCamera) {
+  if (!state.gameCameraReady) {
+    state.gameCameraX = targetCamera.x;
+    state.gameCameraY = targetCamera.y;
+    state.gameCameraReady = true;
+    return targetCamera;
+  }
+
+  state.gameCameraX += (targetCamera.x - state.gameCameraX) * GAME_CAMERA_LERP;
+  state.gameCameraY += (targetCamera.y - state.gameCameraY) * GAME_CAMERA_LERP;
+
+  return { x: state.gameCameraX, y: state.gameCameraY };
+}
+
+function renderGameFrame(timestamp = performance.now()) {
+  if (!gameContext || !state.gameSession?.zone || !state.gameSession?.player?.position) {
+    state.gameLoopId = window.requestAnimationFrame(renderGameFrame);
+    return;
+  }
+
+  const { zone, player } = state.gameSession;
+  resizeGameCanvas();
+  const zoneSize = getZonePixelSize(zone);
+  const viewportWidth = state.gameViewportWidth;
+  const viewportHeight = state.gameViewportHeight;
+  const worldScale = getWorldRenderScale(zone);
+  const worldViewportWidth = viewportWidth / worldScale;
+  const worldViewportHeight = viewportHeight / worldScale;
+  const playerRenderPosition = getRenderedPlayerPosition(timestamp);
+  const camera = updateSmoothCamera(getCameraOffset(zone, playerRenderPosition, worldViewportWidth, worldViewportHeight));
+  const padX = Math.max(0, (worldViewportWidth - zoneSize.width) / 2);
+  const padY = Math.max(0, (worldViewportHeight - zoneSize.height) / 2);
+
+  gameContext.clearRect(0, 0, viewportWidth, viewportHeight);
+  const skyGradient = gameContext.createLinearGradient(0, 0, 0, viewportHeight);
+  const backdropColor = normalizeHexColor(state.gameBackdropColor, "#b7dced");
+  skyGradient.addColorStop(0, mixColors(backdropColor, "#ffffff", 0.2));
+  skyGradient.addColorStop(1, backdropColor);
+  gameContext.fillStyle = skyGradient;
+  gameContext.fillRect(0, 0, viewportWidth, viewportHeight);
+
+  gameContext.save();
+  gameContext.scale(worldScale, worldScale);
+  const snappedTranslateX = Math.round((padX - camera.x) * worldScale) / worldScale;
+  const snappedTranslateY = Math.round((padY - camera.y) * worldScale) / worldScale;
+  gameContext.translate(snappedTranslateX, snappedTranslateY);
+
+  zone.tiles.forEach((row, y) => {
+    Array.from(row).forEach((tile, x) => {
+      drawGameTile(gameContext, tile, x, y, timestamp);
+    });
+  });
+
+  (zone.features || []).forEach((feature) => {
+    drawFeature(gameContext, feature, timestamp);
+  });
+
+  drawPortalMarkers(gameContext, zone.portals || [], timestamp);
+  drawPlayer(gameContext, player, timestamp, playerRenderPosition);
+
+  gameContext.restore();
+  drawAmbientParticles(gameContext, zone, timestamp);
+
+  // Update HUD meta line every frame so time ticks in real time
+  if (!state.gameMovePending) {
+    gameMeta.textContent = `${zone.name || "-"}  ·  ${zone.visitorsToday ?? 0} people  ·  ${formatTimePlayed(player.sessionStartedAt)}`;
+  }
+
+  state.gameLoopId = window.requestAnimationFrame(renderGameFrame);
+}
+
+function ensureGameLoop() {
+  if (!gameContext || state.gameLoopId) {
+    return;
+  }
+
+  state.gameLoopId = window.requestAnimationFrame(renderGameFrame);
+}
+
+function renderGameSession(game) {
+  const previousZoneId = state.gameSession?.zone?.id || "";
+  state.gameSession = game || null;
+  state.gamePreview = game?.gamePreview || null;
+
+  if (!game?.zone || !game?.player?.position) {
+    state.gameCameraReady = false;
+    syncGameWindowLabels("");
+    gameZone.textContent = t("game.loadingZone");
+    gamePosition.textContent = tf("game.position", { zone: "--", x: "--", y: "--" });
+    gameMeta.textContent = t("game.loadingMeta");
+    setGameStatus(t("game.connecting"));
+    return;
+  }
+
+  const { zone, player } = game;
+  const incomingX = Number(player.position.x) || 0;
+  const incomingY = Number(player.position.y) || 0;
+
+  if (!state.playerTweenStartAt || previousZoneId !== zone.id) {
+    state.playerRenderX = incomingX;
+    state.playerRenderY = incomingY;
+    state.playerStartX = incomingX;
+    state.playerStartY = incomingY;
+    state.playerTargetX = incomingX;
+    state.playerTargetY = incomingY;
+    state.playerTweenStartAt = performance.now();
+  } else if (state.playerTargetX !== incomingX || state.playerTargetY !== incomingY) {
+    state.playerStartX = state.playerRenderX;
+    state.playerStartY = state.playerRenderY;
+    state.playerTargetX = incomingX;
+    state.playerTargetY = incomingY;
+    state.playerTweenStartAt = performance.now();
+  }
+
+  resizeGameCanvas();
+  const worldScale = getWorldRenderScale(zone);
+  const worldViewportWidth = state.gameViewportWidth / worldScale;
+  const worldViewportHeight = state.gameViewportHeight / worldScale;
+  const targetCamera = getCameraOffset(zone, { x: state.playerTargetX, y: state.playerTargetY }, worldViewportWidth, worldViewportHeight);
+  if (!state.gameCameraReady || previousZoneId !== zone.id) {
+    state.gameCameraX = targetCamera.x;
+    state.gameCameraY = targetCamera.y;
+    state.gameCameraReady = true;
+  }
+
+  gameZone.textContent = zone.name || t("game.loadingZone");
+  syncGameWindowLabels(zone.name || "");
+  gamePosition.textContent = tf("game.position", {
+    zone: zone.name || "--",
+    x: player.position.x,
+    y: player.position.y
+  });
+  gameMeta.textContent = `${zone.name || "-"}  ·  ${zone.visitorsToday ?? 0} people  ·  ${formatTimePlayed(player.sessionStartedAt)}`;
+
+  if (!state.gameMovePending && !player.running) {
+    setGameStatus(t("game.status.offline"));
+  }
+
+  ensureGameLoop();
 }
 
 function applyConfig(config) {
   const wallpaperColor = config.wallpaperColor || "#3f76bf";
+  const windowBgColor = normalizeHexColor(config.windowBgColor, "#f2f4f8");
   const borderColor = config.borderColor || "#0f2b4a";
   const themeColor = config.themeColor || "#2f6eb1";
+  const textColor = normalizeHexColor(config.textColor, "#16202b");
+  const gameBackdropColor = normalizeHexColor(config.gameBackdropColor, "#b7dced");
   const soundEnabled = Boolean(config.soundEnabled);
   const language = normalizeLanguage(config.language);
 
   document.documentElement.style.setProperty("--desktop-wallpaper", wallpaperColor);
+  document.documentElement.style.setProperty("--window-bg", windowBgColor);
   document.documentElement.style.setProperty("--window-border", borderColor);
 
   wallpaperColorInput.value = wallpaperColor;
+  windowBgColorInput.value = windowBgColor;
   borderColorInput.value = borderColor;
   applyThemeColor(themeColor);
+  applyTextColor(textColor);
+  gameBackdropColorInput.value = gameBackdropColor;
+  state.gameBackdropColor = gameBackdropColor;
   soundEnabledInput.checked = soundEnabled;
   state.soundEnabled = soundEnabled;
 
@@ -1716,7 +3011,7 @@ async function refreshSessionSummary() {
 async function loadWindowData() {
   const query = { name: userName };
 
-  const [session, profile, friends, notifications, messages, feed, config, gamePreview] = await Promise.all([
+  const [session, profile, friends, notifications, messages, feed, config, gameSession] = await Promise.all([
     apiRequest(buildQuery("/api/session", query)),
     apiRequest(buildQuery("/api/profile", query)),
     apiRequest(buildQuery("/api/friends", query)),
@@ -1724,7 +3019,7 @@ async function loadWindowData() {
     apiRequest(buildQuery("/api/messages", query)),
     apiRequest(buildQuery("/api/feed", query)),
     apiRequest(buildQuery("/api/config", query)),
-    apiRequest(buildQuery("/api/game-preview", query))
+    apiRequest(buildQuery("/api/game-session", query))
   ]);
 
   state.summary.friendCount = session.summary.friendCount;
@@ -1739,7 +3034,47 @@ async function loadWindowData() {
   renderNotifications(notifications.notifications || []);
   renderConversations(messages.conversations || []);
   renderFeed(feed.feed || []);
-  renderGamePreview(gamePreview.gamePreview || {});
+  renderGameSession(gameSession.game || null);
+}
+
+async function moveGamePlayer(direction) {
+  const now = performance.now();
+  if (!direction || state.gameMovePending || (now - state.gameLastMoveAt) < GAME_MOVE_COOLDOWN_MS) {
+    return;
+  }
+
+  state.gameMovePending = true;
+  state.gameLastMoveAt = now;
+
+  const previousZoneId = state.gameSession?.zone?.id || "";
+
+  try {
+    const response = await apiRequest("/api/game-move", {
+      method: "POST",
+      body: JSON.stringify({ name: userName, direction })
+    });
+
+    renderGameSession(response.game || null);
+
+    if (response.game?.zone?.id && response.game.zone.id !== previousZoneId) {
+      setGameStatus(tf("game.status.portal", { zone: response.game.zone.name }));
+    }
+  } catch (error) {
+    setGameStatus(error.message);
+  } finally {
+    state.gameMovePending = false;
+  }
+}
+
+async function stopGameSession() {
+  try {
+    await apiRequest("/api/game-session/stop", {
+      method: "POST",
+      body: JSON.stringify({ name: userName })
+    });
+  } catch (_error) {
+    // Ignore logout session stop failures.
+  }
 }
 
 async function runFriendAction(action, friendId) {
@@ -1867,8 +3202,11 @@ async function saveConfig(event) {
   const payload = {
     name: userName,
     wallpaperColor: wallpaperColorInput.value,
+    windowBgColor: windowBgColorInput.value,
     borderColor: borderColorInput.value,
     themeColor: themeColorInput.value,
+    textColor: textColorInput.value,
+    gameBackdropColor: gameBackdropColorInput.value,
     soundEnabled: soundEnabledInput.checked,
     language: normalizeLanguage(languageSelect.value)
   };
@@ -2103,6 +3441,7 @@ profileAvatarInput.addEventListener("change", async () => {
 });
 
 restoreWindowLayout();
+window.requestAnimationFrame(resizeGameCanvas);
 
 document.addEventListener(
   "click",
@@ -2130,6 +3469,20 @@ window.addEventListener(
   },
   { once: true }
 );
+
+window.addEventListener("keydown", (event) => {
+  const direction = getGameDirectionFromKey(event.key);
+  if (!direction) {
+    return;
+  }
+
+  if (isTypingTarget(event.target) || !state.gameSession || !avatarEditorModal.classList.contains("hidden")) {
+    return;
+  }
+
+  event.preventDefault();
+  moveGamePlayer(direction);
+});
 
 closeButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -2180,6 +3533,9 @@ taskButtons.forEach((button) => {
     target.classList.remove("hidden");
     bringToFront(target);
     keepInViewport(target);
+    if (windowName === "game") {
+      window.requestAnimationFrame(resizeGameCanvas);
+    }
     saveWindowLayout();
   });
 });
@@ -2241,6 +3597,11 @@ soundEnabledInput.addEventListener("change", () => {
 
 themeColorInput.addEventListener("input", () => {
   applyThemeColor(themeColorInput.value);
+  applyTextColor(state.textColor || textColorInput.value);
+});
+
+textColorInput.addEventListener("input", () => {
+  applyTextColor(textColorInput.value);
 });
 
 configTabs.forEach((tab) => {
@@ -2261,6 +3622,7 @@ window.addEventListener("resize", () => {
 
     keepInViewport(win);
   });
+  resizeGameCanvas();
   saveWindowLayout();
 });
 
@@ -2339,7 +3701,8 @@ securitySaveBtn.addEventListener("click", async () => {
   }
 });
 
-document.getElementById("logout").addEventListener("click", () => {
+document.getElementById("logout").addEventListener("click", async () => {
+  await stopGameSession();
   localStorage.removeItem("authUser");
   window.location.href = "/";
 });
